@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		378B6C70294E3E66001A3632 /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378B6C6F294E3E66001A3632 /* ImagesListCell.swift */; };
 		37C938D7294E34930068B964 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C938D6294E34930068B964 /* AppDelegate.swift */; };
 		37C938D9294E34930068B964 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C938D8294E34930068B964 /* SceneDelegate.swift */; };
-		37C938DB294E34930068B964 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C938DA294E34930068B964 /* ViewController.swift */; };
+		37C938DB294E34930068B964 /* ImagesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C938DA294E34930068B964 /* ImagesListViewController.swift */; };
 		37C938DE294E34930068B964 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 37C938DC294E34930068B964 /* Main.storyboard */; };
 		37C938E0294E34940068B964 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37C938DF294E34940068B964 /* Assets.xcassets */; };
 		37C938E3294E34940068B964 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 37C938E1294E34940068B964 /* LaunchScreen.storyboard */; };
@@ -17,10 +18,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		378B6C6F294E3E66001A3632 /* ImagesListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListCell.swift; sourceTree = "<group>"; };
 		37C938D3294E34930068B964 /* ImageFeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageFeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37C938D6294E34930068B964 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		37C938D8294E34930068B964 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		37C938DA294E34930068B964 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		37C938DA294E34930068B964 /* ImagesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListViewController.swift; sourceTree = "<group>"; };
 		37C938DD294E34930068B964 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		37C938DF294E34940068B964 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		37C938E2294E34940068B964 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -39,6 +41,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		378B6C71294E4048001A3632 /* ImagesList */ = {
+			isa = PBXGroup;
+			children = (
+				37C938DA294E34930068B964 /* ImagesListViewController.swift */,
+				378B6C6F294E3E66001A3632 /* ImagesListCell.swift */,
+			);
+			path = ImagesList;
+			sourceTree = "<group>";
+		};
 		37C938CA294E34930068B964 = {
 			isa = PBXGroup;
 			children = (
@@ -59,9 +70,9 @@
 			isa = PBXGroup;
 			children = (
 				37C938EA294E34B10068B964 /* Helpers */,
+				378B6C71294E4048001A3632 /* ImagesList */,
 				37C938D6294E34930068B964 /* AppDelegate.swift */,
 				37C938D8294E34930068B964 /* SceneDelegate.swift */,
-				37C938DA294E34930068B964 /* ViewController.swift */,
 				37C938DC294E34930068B964 /* Main.storyboard */,
 				37C938DF294E34940068B964 /* Assets.xcassets */,
 				37C938E1294E34940068B964 /* LaunchScreen.storyboard */,
@@ -149,7 +160,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37C938DB294E34930068B964 /* ViewController.swift in Sources */,
+				378B6C70294E3E66001A3632 /* ImagesListCell.swift in Sources */,
+				37C938DB294E34930068B964 /* ImagesListViewController.swift in Sources */,
 				37C938D7294E34930068B964 /* AppDelegate.swift in Sources */,
 				37C938D9294E34930068B964 /* SceneDelegate.swift in Sources */,
 				37C938EC294E34C40068B964 /* UIColor+Extensions.swift in Sources */,
