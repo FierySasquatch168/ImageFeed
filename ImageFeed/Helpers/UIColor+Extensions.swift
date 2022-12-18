@@ -9,4 +9,6 @@ import UIKit
 
 extension UIColor {
     static var ypBlack: UIColor? { UIColor(named: "YPBlack")}
+    static var topColor: UIColor? { UIColor(named: "TopColor")}
+    static var bottomColor: UIColor? { UIColor(named: "BottomColor")}
 }

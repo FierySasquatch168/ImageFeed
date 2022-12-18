@@ -9,7 +9,16 @@ import UIKit
 
 class ImagesListViewController: UIViewController {
 
-    private var tableView = UITableView()
+    private lazy var tableView: UITableView = {
+       let tableView = UITableView()
+       tableView.delegate = self
+       tableView.dataSource = self
+       tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
+       tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+       tableView.translatesAutoresizingMaskIntoConstraints = false
+       return tableView
+    }()
+    
     private var photosName: [String] = Array(0..<20).compactMap{ "\($0)" }
     private lazy var dateFormatter = {
         let formatter = DateFormatter()
@@ -17,6 +26,8 @@ class ImagesListViewController: UIViewController {
         formatter.timeStyle = .none
         return formatter
     }()
+    
+    // MARK: Lifecycle
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
@@ -37,15 +48,16 @@ class ImagesListViewController: UIViewController {
         
     }
     
+    // MARK: Private funcs
+    
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         guard let image = UIImage(named: "\(photosName[indexPath.row])") else { return }
-        
         cell.mainImage.image = image
+        
         cell.dateLabel.text = dateFormatter.string(from: Date())
         
         let buttonImage = indexPath.row % 2 != 0 ? UIImage(named: "Active") : UIImage(named: "No Active")
         cell.likeButton.setImage(buttonImage, for: .normal)
-        
     }
 
     private func setupTableView() {
@@ -71,9 +83,8 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
         
-        guard let imageListCell = cell as? ImagesListCell else {
+        guard let imageListCell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath) as? ImagesListCell else {
             return UITableViewCell()
         }
         

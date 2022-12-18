@@ -7,13 +7,14 @@
 
 import UIKit
 
-class ImagesListCell: UITableViewCell {
+final class ImagesListCell: UITableViewCell {
     
     static let reuseIdentifier = "ImagesListCell"
     
     var mainImage = UIImageView()
     var dateLabel = UILabel()
     var likeButton = UIButton()
+    var gradientView = UIView()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super .init(style: style, reuseIdentifier: reuseIdentifier)
@@ -21,22 +22,16 @@ class ImagesListCell: UITableViewCell {
         backgroundColor = .clear
         
         configureMainImage()
-        configureDateLabel()
         configureLikeButton()
+        configureGradientView()
+        configureDateLabel()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
+    // MARK: UI Configuration
     
     private func configureMainImage() {
         addSubview(mainImage)
@@ -75,5 +70,16 @@ class ImagesListCell: UITableViewCell {
             likeButton.trailingAnchor.constraint(equalTo: mainImage.trailingAnchor, constant: -10.5)
         ])
     }
-
+    
+    private func configureGradientView() {
+        addSubview(gradientView)
+        gradientView.translatesAutoresizingMaskIntoConstraints = false  
+        
+        NSLayoutConstraint.activate([
+            gradientView.leadingAnchor.constraint(equalTo: mainImage.leadingAnchor),
+            gradientView.trailingAnchor.constraint(equalTo: mainImage.trailingAnchor),
+            gradientView.bottomAnchor.constraint(equalTo: mainImage.bottomAnchor),
+            gradientView.heightAnchor.constraint(equalToConstant: 30)
+        ])
+    }
 }
