@@ -16,6 +16,8 @@ class ImagesListViewController: UIViewController {
        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .ypBlack
+        tableView.separatorStyle = .none
        return tableView
     }()
     
@@ -37,14 +39,7 @@ class ImagesListViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .ypBlack
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        
         setupTableView()
-        
-        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
-        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         
     }
     
@@ -58,14 +53,11 @@ class ImagesListViewController: UIViewController {
         
         let buttonImage = indexPath.row % 2 != 0 ? UIImage(named: "Active") : UIImage(named: "No Active")
         cell.likeButton.setImage(buttonImage, for: .normal)
+        
     }
 
     private func setupTableView() {
         view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        
-        tableView.backgroundColor = .ypBlack
-        tableView.separatorStyle = .none
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
