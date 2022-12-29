@@ -16,6 +16,8 @@ class ImagesListViewController: UIViewController {
        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .ypBlack
+        tableView.separatorStyle = .none
        return tableView
     }()
     
@@ -37,14 +39,7 @@ class ImagesListViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .ypBlack
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        
         setupTableView()
-        
-        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
-        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         
     }
     
@@ -59,27 +54,10 @@ class ImagesListViewController: UIViewController {
         let buttonImage = indexPath.row % 2 != 0 ? UIImage(named: "Active") : UIImage(named: "No Active")
         cell.likeButton.setImage(buttonImage, for: .normal)
         
-        let layer = CAGradientLayer()
-        
-        layer.colors = [UIColor.blue.cgColor, UIColor.purple.cgColor]
-        
-        layer.locations = [0,1]
-        layer.startPoint = CGPoint(x: 0.25, y: 0.5)
-        layer.endPoint = CGPoint(x: 0.75, y: 0.5)
-        layer.transform = CATransform3DMakeAffineTransform(CGAffineTransform(a: 0, b: 0.54, c: -0.54, d: 0, tx: 0.77, ty: 0))
-        layer.frame.size.width = 2 * image.size.width
-        layer.frame.size.height = 30
-        
-        cell.gradientView.layer.addSublayer(layer)
-        
     }
 
     private func setupTableView() {
         view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        
-        tableView.backgroundColor = .ypBlack
-        tableView.separatorStyle = .none
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
