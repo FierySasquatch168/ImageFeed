@@ -11,4 +11,6 @@ extension UIColor {
     static var ypBlack: UIColor? { UIColor(named: "YPBlack")}
     static var topColor: UIColor? { UIColor(named: "TopColor")}
     static var bottomColor: UIColor? { UIColor(named: "BottomColor")}
+    static var ypWhite: UIColor? { UIColor(named: "YPWhite")}
+    static var ypGrey: UIColor? { UIColor(named: "YPGrey")}
 }
