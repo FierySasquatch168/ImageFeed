@@ -85,7 +85,19 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let singleImageVC = storyboard.instantiateViewController(withIdentifier: "SingleImageViewController") as? SingleImageViewController else { fatalError() }
+        
+       
+        
+        guard let image = UIImage(named: "\(photosName[indexPath.row])") else { return }
+        singleImageVC.image = image
+        
+        singleImageVC.modalPresentationStyle = .fullScreen
+        self.present(singleImageVC, animated: true)
+       
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
