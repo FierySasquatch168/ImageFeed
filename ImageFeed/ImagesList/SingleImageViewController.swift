@@ -44,11 +44,11 @@ final class SingleImageViewController: UIViewController {
         
     }
     
-    @objc func dismissButtonTapped() {
+    @objc private func dismissButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func didTapShareButton() {
+    @objc private func didTapShareButton() {
         let share = UIActivityViewController(
             activityItems: [image],
             applicationActivities: nil
