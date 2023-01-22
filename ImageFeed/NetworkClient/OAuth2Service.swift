@@ -27,7 +27,6 @@ final class OAuth2Service {
     }
     
     func fetchAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
-        
         let request = authTokenRequest(code: code)
         let task = object(for: request) { [weak self] result in
             guard let self = self else { return }
@@ -51,7 +50,8 @@ final class OAuth2Service {
             + "&&redirect_uri=\(redirectURI)"
             + "&&code=\(code)"
             + "&&grant_type=authorization_code",
-            httpMethod: "POST")
+            httpMethod: "POST",
+            baseURL: URL(string: "https://unsplash.com")!)
     }
 }
 

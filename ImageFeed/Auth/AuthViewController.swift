@@ -49,12 +49,6 @@ final class AuthViewController: UIViewController  {
         setupMainImage()
         setuploginButton()
         
-        if oAuth2TokenStorage != nil {
-            print("oAuth2TokenStorage is not nil")
-        } else {
-            print("oAuth2TokenStorage is nil")
-        }
-        
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -105,11 +99,9 @@ extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         oAuth2Service?.fetchAuthToken(code: code, completion: { [weak self] result in
             guard let self = self else { return }
-            print("AuthViewController oAuth2Service?.fetchAuthToken works")
             switch result {
             case .success(let token):
                 self.oAuth2TokenStorage?.token = token
-                print(token)
             case .failure(let error):
                 print(error) // TODO: to add alert for error case
             }
