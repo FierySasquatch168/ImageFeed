@@ -12,21 +12,15 @@ class SplashViewController: UIViewController {
     private let oAuth2Service = OAuth2Service()
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-//        UserDefaults.resetDefaults()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        print("SplashViewController viewDidAppear")
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         
         if let token = oAuth2TokenStorage.token {
             switchToTabBarController()
         } else {
             switchToAuthViewController()
         }
+        
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -51,6 +45,8 @@ class SplashViewController: UIViewController {
         
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
         window.rootViewController = tabbarVC
+        
+//        self.present(tabbarVC, animated: true)
     }
     
     private func switchToAuthViewController() {
