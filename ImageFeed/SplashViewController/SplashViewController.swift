@@ -39,7 +39,8 @@ class SplashViewController: UIViewController {
         let tabbarVC = UITabBarController()
         UITabBar.appearance().tintColor = .ypWhite
         UITabBar.appearance().barTintColor = .ypBlack
-        UITabBar.appearance().backgroundColor = .ypBlack
+        UITabBar.appearance().isTranslucent = false
+        
         tabbarVC.viewControllers = [navVC, profileVC]
         tabbarVC.modalPresentationStyle = .fullScreen
         
