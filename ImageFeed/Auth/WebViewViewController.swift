@@ -26,13 +26,11 @@ final class WebViewViewController: UIViewController {
         let webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.navigationDelegate = self
         
-        
         return webView
     }()
     
     private lazy var backButton: UIButton = {
         let button = UIButton(type: .custom)
-        
         
         return button
     }()
@@ -95,20 +93,6 @@ final class WebViewViewController: UIViewController {
     }
     
     private func code(from navigationAction: WKNavigationAction) -> String? {
-        print("code func is running...")
-        
-        let test = navigationAction.request.url
-        let test2 = URLComponents(string: test?.absoluteString ?? "no url")
-        let test5 = test2?.path
-        let test3 = test2?.queryItems
-        let test4 = test3?.first(where: { $0.name == "code" })
-        
-        print("navigationAction.request.url is: \(test)")
-        print("URLComponents are: \(test2)")
-        print("URLComponents path is: \(test5)")
-        print("urlComponents.queryItems are: \(test3)")
-        print("codeItem is: \(test4)")
-        
         if
             let url = navigationAction.request.url, /// Получаем из навигационного действия navigationAction URL
             let urlComponents = URLComponents(string: url.absoluteString), /// Получаем значения компонентов из URL
@@ -187,10 +171,8 @@ extension WebViewViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let code = code(from: navigationAction) {
             authDelegate?.webViewViewController(self, didAuthenticateWithCode: code)
-            print("authDelegate?.webViewViewController didAuthenticateWithCode works")
             decisionHandler(.cancel)
         } else {
-            print("code is nil")
             decisionHandler(.allow)
         }
     }

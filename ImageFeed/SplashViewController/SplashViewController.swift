@@ -12,8 +12,15 @@ class SplashViewController: UIViewController {
     private let oAuth2Service = OAuth2Service()
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+//        UserDefaults.resetDefaults()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        print("SplashViewController viewDidAppear")
         
         if let token = oAuth2TokenStorage.token {
             switchToTabBarController()
@@ -27,22 +34,33 @@ class SplashViewController: UIViewController {
     }
     
     private func switchToTabBarController() {
-        let navVC = UINavigationController(rootViewController: ImagesListViewController())
+        print("SplashViewController switchToTabBarController")
+        let navVC = CustomNavigationController(rootViewController: ImagesListViewController())
+        navVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_editorial_active"), tag: 0)
+        navVC.navigationBar.isHidden = true
+
+        let profileVC = ProfileViewController()
+        profileVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_profile_active"), tag: 1)
+
         let tabbarVC = UITabBarController()
         UITabBar.appearance().tintColor = .ypWhite
-        tabbarVC.viewControllers = [navVC, ProfileViewController()]
+        UITabBar.appearance().barTintColor = .ypBlack
+        UITabBar.appearance().backgroundColor = .ypBlack
+        tabbarVC.viewControllers = [navVC, profileVC]
         tabbarVC.modalPresentationStyle = .fullScreen
         
-        self.present(tabbarVC, animated: true)
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
+        window.rootViewController = tabbarVC
     }
     
     private func switchToAuthViewController() {
-        let nextVC = AuthViewController()
-        nextVC.authViewControllerDelegate = self
+        print("SplashViewController switchToAuthViewController")
+        let authVC = AuthViewController()
+        authVC.authViewControllerDelegate = self
         
-        let navVC = UINavigationController(rootViewController: nextVC)
+        let navVC = CustomNavigationController(rootViewController: authVC)
         navVC.modalPresentationStyle = .fullScreen
-         
+        
         self.present(navVC, animated: true)
     }
     
@@ -50,33 +68,25 @@ class SplashViewController: UIViewController {
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        print("SplashViewController authViewController works 1")
         dismiss(animated: true) { [weak self] in
-            print("SplashViewController authViewController dismiss works")
+            print("SplashViewController - authViewController dismiss done")
             guard let self = self else {
-                print("SplashViewController authViewController self is nil")
                 return
             }
-            print("SplashViewController authViewController self is not nil")
-            print(code)
-            self.fetchOAuthToker(code: code)
+            
+            self.fetchOAuthToken(code: code)
         }
     }
     
-    private func fetchOAuthToker(code: String) {
-        print("SplashViewController fetchOAuthToker works 1")
+    private func fetchOAuthToken(code: String) {
         oAuth2Service.fetchAuthToken(code: code, completion: { result in
-            print("SplashViewController fetchOAuthToker works 2")
             switch result {
             case .success:
-                print("SplashViewController fetchOAuthToker result has data")
+                print("SplashViewController - fetchOAuthToken switchToTabBarController done")
                 self.switchToTabBarController()
             case .failure:
-                print("SplashViewController fetchOAuthToker result has no data")
                 break
             }
         })
     }
-    
-    
 }
