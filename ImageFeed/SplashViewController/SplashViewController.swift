@@ -46,8 +46,6 @@ class SplashViewController: UIViewController {
         
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
         window.rootViewController = tabbarVC
-        
-//        self.present(tabbarVC, animated: true)
     }
     
     private func switchToAuthViewController() {
