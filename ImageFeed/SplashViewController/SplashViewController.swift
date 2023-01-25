@@ -28,7 +28,6 @@ class SplashViewController: UIViewController {
     }
     
     private func switchToTabBarController() {
-        print("SplashViewController switchToTabBarController")
         let navVC = CustomNavigationController(rootViewController: ImagesListViewController())
         navVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_editorial_active"), tag: 0)
         navVC.navigationBar.isHidden = true
@@ -49,7 +48,6 @@ class SplashViewController: UIViewController {
     }
     
     private func switchToAuthViewController() {
-        print("SplashViewController switchToAuthViewController")
         let authVC = AuthViewController()
         authVC.authViewControllerDelegate = self
         
@@ -63,8 +61,7 @@ class SplashViewController: UIViewController {
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        dismiss(animated: true) { [weak self] in
-            print("SplashViewController - authViewController dismiss done")
+        vc.dismiss(animated: true) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -77,7 +74,6 @@ extension SplashViewController: AuthViewControllerDelegate {
         oAuth2Service.fetchAuthToken(code: code, completion: { result in
             switch result {
             case .success:
-                print("SplashViewController - fetchOAuthToken switchToTabBarController done")
                 self.switchToTabBarController()
             case .failure:
                 break

@@ -97,22 +97,11 @@ final class AuthViewController: UIViewController  {
 extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        oAuth2Service?.fetchAuthToken(code: code, completion: { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let token):
-                self.oAuth2TokenStorage?.token = token
-            case .failure(let error):
-                print(error) // TODO: to add alert for error case
-            }
-        })
-        
         authViewControllerDelegate?.authViewController(self, didAuthenticateWithCode: code)
         
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        dismiss(animated: true)
-        print("AuthVC webViewViewControllerDidCancel works")
+        vc.dismiss(animated: true)
     }
 }
