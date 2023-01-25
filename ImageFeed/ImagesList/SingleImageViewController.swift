@@ -16,9 +16,9 @@ final class SingleImageViewController: UIViewController {
         }
     }
     
-    private var imageView = UIImageView()
-    private var dismissButton = UIButton()
-    private var shareButton = UIButton()
+    private lazy var imageView = UIImageView()
+    private lazy var dismissButton = UIButton()
+    private lazy var shareButton = UIButton()
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -44,11 +44,11 @@ final class SingleImageViewController: UIViewController {
         
     }
     
-    @objc func dismissButtonTapped() {
+    @objc private func dismissButtonTapped() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func didTapShareButton() {
+    @objc private func didTapShareButton() {
         let share = UIActivityViewController(
             activityItems: [image],
             applicationActivities: nil

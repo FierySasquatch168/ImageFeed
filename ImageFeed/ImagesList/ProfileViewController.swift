@@ -7,19 +7,18 @@
 
 import UIKit
 
-class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController {
 
-    private var profileImage = UIImageView()
-    private var logoutButton = UIButton()
-    private var userNameLabel = UILabel()
-    private var userEmailLabel = UILabel()
-    private var userDescriptionLabel = UILabel()
+    private lazy var profileImage = UIImageView()
+    private lazy var logoutButton = UIButton()
+    private lazy var userNameLabel = UILabel()
+    private lazy var userEmailLabel = UILabel()
+    private lazy var userDescriptionLabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupUI()
-        
         
     }
     
