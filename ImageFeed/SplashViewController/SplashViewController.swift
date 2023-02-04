@@ -6,17 +6,21 @@
 //
 
 import UIKit
+import ProgressHUD
 
 class SplashViewController: UIViewController {
 
     private let oAuth2Service = OAuth2Service()
     private let oAuth2TokenStorage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
+    
+    // TODO: override color appearence for dark mode
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         if let token = oAuth2TokenStorage.token {
-            switchToTabBarController()
+            fetchProfile(token: token)
         } else {
             switchToAuthViewController()
         }
@@ -56,28 +60,55 @@ class SplashViewController: UIViewController {
         
         self.present(navVC, animated: true)
     }
-    
 }
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         vc.dismiss(animated: true) { [weak self] in
-            guard let self = self else {
-                return
-            }
-            
+            guard let self = self else { return }
+            UIBlockingProgressHUD.show()
             self.fetchOAuthToken(code: code)
         }
     }
     
     private func fetchOAuthToken(code: String) {
-        oAuth2Service.fetchAuthToken(code: code, completion: { result in
+        oAuth2Service.fetchAuthToken(code: code, completion: { [weak self] result in
+            guard let self = self else { return }
             switch result {
-            case .success:
-                self.switchToTabBarController()
+            case .success(let token):
+                self.fetchProfile(token: token)
             case .failure:
+                // TODO: Show error
+                UIBlockingProgressHUD.dismiss()
                 break
             }
         })
+    }
+    
+    private func fetchProfile(token: String) {
+        profileService.fetchProfile(token: token) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let profile):
+                guard let username = profile.username else { return }
+                ProfileImageService.shared.fetchProfileImageURL(username: username) { result in
+                    
+                    UIBlockingProgressHUD.dismiss()
+                    self.switchToTabBarController()
+                    
+                    switch result {
+                    case .failure(let error):
+                        print(error)
+                    case .success(let imageName):
+                        print(imageName)
+                    }
+                }
+            case .failure(let error):
+                // TODO: Show alert
+                UIBlockingProgressHUD.dismiss()
+                print(error)
+                break
+            }
+        }
     }
 }

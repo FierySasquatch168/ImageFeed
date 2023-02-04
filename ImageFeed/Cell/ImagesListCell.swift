@@ -37,6 +37,8 @@ final class ImagesListCell: UITableViewCell {
     override func layoutSubviews() {
         let layer = CAGradientLayer()
         
+        // TODO: Replace gradient for vectorImage for better performance
+        
         layer.colors = [
             UIColor(red: 0.102, green: 0.106, blue: 0.133, alpha: 0).cgColor,
             UIColor(red: 0.102, green: 0.106, blue: 0.133, alpha: 1).cgColor

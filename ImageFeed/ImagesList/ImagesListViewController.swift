@@ -10,15 +10,15 @@ import UIKit
 class ImagesListViewController: UIViewController {
 
     private lazy var tableView: UITableView = {
-       let tableView = UITableView()
-       tableView.delegate = self
-       tableView.dataSource = self
-       tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
-       tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-       tableView.translatesAutoresizingMaskIntoConstraints = false
+        let tableView = UITableView()
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
+        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.backgroundColor = .ypBlack
         tableView.separatorStyle = .none
-       return tableView
+        return tableView
     }()
     
     private var photosName: [String] = Array(0..<20).compactMap{ "\($0)" }

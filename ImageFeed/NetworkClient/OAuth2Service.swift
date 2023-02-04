@@ -17,6 +17,10 @@ final class OAuth2Service {
     
     static let shared = OAuth2Service()
     
+    private var lastCode: String?
+    private var task: URLSessionTask?
+    private var urlSession = URLSession.shared
+    
     private (set) var authToken: String? {
         get {
             return OAuth2TokenStorage().token
@@ -27,6 +31,11 @@ final class OAuth2Service {
     }
     
     func fetchAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        assert(Thread.isMainThread)
+        if lastCode == code { return } ///Если lastCode != code, то мы должны всё-таки сделать новый запрос;
+        task?.cancel() /// Старый запрос нужно отменить, но если task == nil, то ничего не будет выполнено, и мы просто пройдём дальше
+        lastCode = code /// Запомнили code, использованный в запросе.
+                    
         let request = authTokenRequest(code: code)
         let task = object(for: request) { [weak self] result in
             guard let self = self else { return }
@@ -35,14 +44,20 @@ final class OAuth2Service {
                 let authToken = body.accessToken
                 self.authToken = authToken
                 completion(.success(authToken))
+                self.task = nil
             case .failure(let error):
                 completion(.failure(error))
+                self.lastCode = nil
             }
         }
+        self.task = task
         task.resume()
     }
     
     func authTokenRequest(code: String) -> URLRequest {
+        
+        // TODO: Rewrite the body using URLComponents func
+        
         URLRequest.makeHTTPRequest(
             path: "/oauth/token"
             + "?client_id=\(accessKey)"

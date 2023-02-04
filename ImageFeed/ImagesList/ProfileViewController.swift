@@ -15,17 +15,31 @@ final class ProfileViewController: UIViewController {
     private lazy var userEmailLabel = UILabel()
     private lazy var userDescriptionLabel = UILabel()
     
+    private var profileService = ProfileService.shared
+    
+    // MARK: Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupUI()
+        updateProfileDetails(profile: profileService.profile)
         
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
+    
+    private func updateProfileDetails(profile: Profile?) {
+        guard let profile = profile else { return }
+        userNameLabel.text = profile.name
+        userEmailLabel.text = profile.loginName
+        userDescriptionLabel.text = profile.bio
+    }
 
+    // MARK: UI setup
+    
     private func setupUI() {
         
         view.backgroundColor = .ypBlack
@@ -89,8 +103,7 @@ final class ProfileViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             userEmailLabel.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 8),
-            userEmailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            userEmailLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -260),
+            userEmailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
         ])
     }
     
