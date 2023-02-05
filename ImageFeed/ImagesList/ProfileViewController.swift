@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
 
@@ -55,7 +56,8 @@ final class ProfileViewController: UIViewController {
         else {
             return
         }
-        // TODO: Update avatar via Kingfisher
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        profileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"), options: [.processor(processor)])
     }
 
     // MARK: UI setup

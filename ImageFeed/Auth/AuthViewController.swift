@@ -13,8 +13,6 @@ protocol AuthViewControllerDelegate: AnyObject {
 
 final class AuthViewController: UIViewController  {
     
-    private weak var oAuth2Service: OAuth2Service?
-    private weak var oAuth2TokenStorage: OAuth2TokenStorage?
     weak var authViewControllerDelegate: AuthViewControllerDelegate?
 
     private lazy var mainImage: UIImageView = {

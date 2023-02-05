@@ -13,11 +13,3 @@ class CustomNavigationController: UINavigationController {
         return topViewController?.preferredStatusBarStyle ?? .lightContent
     }
 }
-
-extension UserDefaults {
-    static func resetDefaults ( ) {
-        if let bundleID = Bundle.main.bundleIdentifier {
-            UserDefaults.standard.removePersistentDomain(forName: bundleID)
-        }
-    }
-}
