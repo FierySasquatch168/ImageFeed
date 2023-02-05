@@ -16,6 +16,7 @@ final class ProfileViewController: UIViewController {
     private lazy var userDescriptionLabel = UILabel()
     
     private var profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     // MARK: Lifecycle
     
@@ -24,6 +25,16 @@ final class ProfileViewController: UIViewController {
 
         setupUI()
         updateProfileDetails(profile: profileService.profile)
+        
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
         
     }
     
@@ -36,6 +47,15 @@ final class ProfileViewController: UIViewController {
         userNameLabel.text = profile.name
         userEmailLabel.text = profile.loginName
         userDescriptionLabel.text = profile.bio
+    }
+    
+    private func updateAvatar() {
+        guard let profileImageURL = ProfileImageService.shared.avatarURL,
+              let url = URL(string: profileImageURL)
+        else {
+            return
+        }
+        // TODO: Update avatar via Kingfisher
     }
 
     // MARK: UI setup

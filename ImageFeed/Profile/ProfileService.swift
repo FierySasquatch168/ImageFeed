@@ -35,17 +35,16 @@ final class ProfileService {
         
         let urlRequest = profileRequest(token: token)
         guard let urlRequest = urlRequest else { return }
+        let session = URLSession.shared
         
-        let task = URLSession.shared.data(for: urlRequest) { [weak self] result in // extension for URLSession provides this request in MainThread
+        let task = session.objectTask(for: urlRequest) { [weak self] (result: Result<ProfileResult, Error>) in // extension for URLSession provides this request in MainThread
             guard let self = self else {
                 return
             }
             switch result {
             case .failure(let error):
                 completion(.failure(error))
-            case .success(let data):
-                guard let profileResult = try? JSONDecoder().decode(ProfileResult.self, from: data) else { return }
-                
+            case .success(let profileResult):
                 let profile = Profile(
                     username: profileResult.username,
                     name: "\(profileResult.firstName ?? "") \(profileResult.lastName ?? "")",

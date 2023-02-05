@@ -37,7 +37,9 @@ final class OAuth2Service {
         lastCode = code /// Запомнили code, использованный в запросе.
                     
         let request = authTokenRequest(code: code)
-        let task = object(for: request) { [weak self] result in
+        let session = URLSession.shared
+        
+        let task = session.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self = self else { return }
             switch result {
             case .success(let body):
@@ -67,25 +69,5 @@ final class OAuth2Service {
             + "&&grant_type=authorization_code",
             httpMethod: "POST",
             baseURL: URL(string: "https://unsplash.com")!)
-    }
-}
-
-
-extension OAuth2Service {
-    private func object(for request: URLRequest, completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void) -> URLSessionTask {
-        let decoder = JSONDecoder()
-        return URLSession.shared.data(for: request) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let object = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-                    completion(.success(object))
-                } catch {
-                    completion(.failure(error))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
     }
 }
