@@ -15,7 +15,7 @@ struct AlertPresenter: AlertPresenterProtocol {
         self.alertDelegate = alertDelegate
     }
     
-    func makeAlertController(alert: AlertModel) {
+    func presentAlertController(alert: AlertModel) {
         let customAlert = UIAlertController(
             title: alert.title,
             message: alert.message,
@@ -25,8 +25,7 @@ struct AlertPresenter: AlertPresenterProtocol {
         
         let action = UIAlertAction(
             title: alert.buttonText,
-            style: .cancel,
-            handler: alert.completion)
+            style: .cancel)
         
         customAlert.addAction(action)
         

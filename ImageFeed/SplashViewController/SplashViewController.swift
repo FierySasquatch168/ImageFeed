@@ -96,9 +96,9 @@ extension SplashViewController: AuthViewControllerDelegate {
             case .success(let token):
                 self.fetchProfile(token: token)
             case .failure:
-                // TODO: Show error
+                // TODO: Show alert
+                UIBlockingProgressHUD.dismiss()
                 self.showAuthErrorAlert()
-                break
             }
         })
     }
@@ -123,6 +123,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                 }
             case .failure(let error):
                 // TODO: Show alert
+                UIBlockingProgressHUD.dismiss()
                 self.showAuthErrorAlert()
             }
         }
@@ -140,12 +141,10 @@ extension SplashViewController: AlertPresenterDelegate {
         let alert = AlertModel(
             title: "Что-то пошло не так(",
             message: "Не удалось войти в систему",
-            buttonText: "OK") { [weak self] _ in
-                UIBlockingProgressHUD.dismiss()
-            }
+            buttonText: "OK")
         
         alertPresenter = AlertPresenter(alertDelegate: self)
-        alertPresenter?.makeAlertController(alert: alert)
+        alertPresenter?.presentAlertController(alert: alert)
         
     }
     
