@@ -14,7 +14,12 @@ final class ImagesListCell: UITableViewCell {
     var mainImage = UIImageView()
     var dateLabel = UILabel()
     var likeButton = UIButton()
-    var gradientView = UIView()
+    var gradientView: UIImageView = {
+        var imageView = UIImageView()
+        imageView.image = UIImage(named: "gradient")
+        
+        return imageView
+    }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super .init(style: style, reuseIdentifier: reuseIdentifier)
@@ -24,34 +29,12 @@ final class ImagesListCell: UITableViewCell {
         configureMainImage()
         configureLikeButton()
         
-        configureGradientView()
+        configureGradientImageView()
         configureDateLabel()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: Gradient override
-    
-    override func layoutSubviews() {
-        let layer = CAGradientLayer()
-        
-        // TODO: Replace gradient for vectorImage for better performance
-        
-        layer.colors = [
-            UIColor(red: 0.102, green: 0.106, blue: 0.133, alpha: 0).cgColor,
-            UIColor(red: 0.102, green: 0.106, blue: 0.133, alpha: 1).cgColor
-        ]
-        
-        layer.locations = [0,1]
-        layer.startPoint = CGPoint(x: 0.25, y: 0.5)
-        layer.endPoint = CGPoint(x: 0.75, y: 0.5)
-        layer.transform = CATransform3DMakeAffineTransform(CGAffineTransform(a: 0, b: 0.54, c: -0.54, d: 0, tx: 0.77, ty: 0))
-        layer.frame = gradientView.bounds
-        layer.cornerRadius = 30
-        
-        gradientView.layer.addSublayer(layer)
     }
     
     // MARK: UI Configuration
@@ -94,7 +77,7 @@ final class ImagesListCell: UITableViewCell {
         ])
     }
     
-    private func configureGradientView() {
+    private func configureGradientImageView() {
         addSubview(gradientView)
         gradientView.translatesAutoresizingMaskIntoConstraints = false
         
