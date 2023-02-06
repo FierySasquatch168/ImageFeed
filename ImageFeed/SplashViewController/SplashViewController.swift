@@ -6,17 +6,38 @@
 //
 
 import UIKit
+import ProgressHUD
 
 class SplashViewController: UIViewController {
 
     private let oAuth2Service = OAuth2Service()
     private let oAuth2TokenStorage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
+    
+    private var alertModel: AlertModel?
+    private var alertPresenter: AlertPresenterProtocol?
+    
+    private lazy var splashViewLogo: UIImageView = {
+        var imageView = UIImageView()
+        imageView.image = UIImage(named: "Vector")
+        
+        return imageView
+    }()
+    
+    // TODO: override color appearence for dark mode
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.backgroundColor = .ypBlack
+        setupSplashViewLogo()
+    }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
         if let token = oAuth2TokenStorage.token {
-            switchToTabBarController()
+            fetchProfile(token: token)
         } else {
             switchToAuthViewController()
         }
@@ -28,19 +49,7 @@ class SplashViewController: UIViewController {
     }
     
     private func switchToTabBarController() {
-        let navVC = CustomNavigationController(rootViewController: ImagesListViewController())
-        navVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_editorial_active"), tag: 0)
-        navVC.navigationBar.isHidden = true
-
-        let profileVC = ProfileViewController()
-        profileVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_profile_active"), tag: 1)
-
-        let tabbarVC = UITabBarController()
-        UITabBar.appearance().tintColor = .ypWhite
-        UITabBar.appearance().barTintColor = .ypBlack
-        UITabBar.appearance().isTranslucent = false
-        
-        tabbarVC.viewControllers = [navVC, profileVC]
+        let tabbarVC = TabBarController()
         tabbarVC.modalPresentationStyle = .fullScreen
         
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
@@ -57,27 +66,86 @@ class SplashViewController: UIViewController {
         self.present(navVC, animated: true)
     }
     
+    // MARK: UI setup
+    
+    private func setupSplashViewLogo() {
+        
+        view.addSubview(splashViewLogo)
+        splashViewLogo.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            splashViewLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            splashViewLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
 }
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         vc.dismiss(animated: true) { [weak self] in
-            guard let self = self else {
-                return
-            }
-            
+            guard let self = self else { return }
+            UIBlockingProgressHUD.show()
             self.fetchOAuthToken(code: code)
         }
     }
     
     private func fetchOAuthToken(code: String) {
-        oAuth2Service.fetchAuthToken(code: code, completion: { result in
+        oAuth2Service.fetchAuthToken(code: code, completion: { [weak self] result in
+            guard let self = self else { return }
             switch result {
-            case .success:
-                self.switchToTabBarController()
+            case .success(let token):
+                self.fetchProfile(token: token)
             case .failure:
-                break
+                // TODO: Show alert
+                UIBlockingProgressHUD.dismiss()
+                self.showAuthErrorAlert()
             }
         })
     }
+    
+    private func fetchProfile(token: String) {
+        profileService.fetchProfile(token: token) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let profile):
+                guard let username = profile.username else { return }
+                ProfileImageService.shared.fetchProfileImageURL(username: username) { result in
+                    
+                    UIBlockingProgressHUD.dismiss()
+                    self.switchToTabBarController()
+                    
+                    switch result {
+                    case .failure(let error):
+                        print(error)
+                    case .success(let imageName):
+                        print(imageName)
+                    }
+                }
+            case .failure(let error):
+                // TODO: Show alert
+                UIBlockingProgressHUD.dismiss()
+                self.showAuthErrorAlert()
+            }
+        }
+    }
+}
+
+extension SplashViewController: AlertPresenterDelegate {
+    func showAlert(alert: UIAlertController?) {
+        guard let alert = alert else { return }
+        self.present(alert, animated: true)
+    }
+    
+    func showAuthErrorAlert() {
+        
+        let alert = AlertModel(
+            title: "Что-то пошло не так(",
+            message: "Не удалось войти в систему",
+            buttonText: "OK")
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+        
+    }
+    
 }

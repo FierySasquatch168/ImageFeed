@@ -15,9 +15,10 @@ extension URLRequest {
     }
 }
 
-extension URLSession {
-    func data(for request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionTask {
-        let fulfillmentCompletion: (Result<Data, Error>) -> Void = { result in
+extension URLSession {    
+    func objectTask<T: Decodable>(for request:  URLRequest, completion: @escaping (Result<T, Error>)-> Void) -> URLSessionTask {
+        
+        let fulfillmentCompletionOnMainThread: (Result<T, Error>) -> Void = { result in
             DispatchQueue.main.async {
                 completion(result)
             }
@@ -28,14 +29,20 @@ extension URLSession {
                let response = response,
                let statusCode = (response as? HTTPURLResponse)?.statusCode {
                 if 200..<300 ~= statusCode {
-                    fulfillmentCompletion(.success(data))
+                    do {
+                        let decoder = JSONDecoder()
+                        let result = try decoder.decode(T.self, from: data)
+                        fulfillmentCompletionOnMainThread(.success(result))
+                    } catch {
+                        fulfillmentCompletionOnMainThread(.failure(error))
+                    }
                 } else {
-                    fulfillmentCompletion(.failure(NetworkError.httpStatusCode(statusCode)))
+                    fulfillmentCompletionOnMainThread(.failure(NetworkError.httpStatusCode(statusCode)))
                 }
             } else if let error = error {
-                fulfillmentCompletion(.failure(NetworkError.urlRequestError(error)))
+                fulfillmentCompletionOnMainThread(.failure(NetworkError.urlRequestError(error)))
             } else {
-                fulfillmentCompletion(.failure(NetworkError.urlSessionError))
+                fulfillmentCompletionOnMainThread(.failure(NetworkError.urlSessionError))
             }
         }
         task.resume()

@@ -11,6 +11,7 @@ import WebKit
 final class WebViewViewController: UIViewController {
 
     private let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+    private var estimatedProgressObservation: NSKeyValueObservation?
     
     weak var authDelegate: WebViewViewControllerDelegate?
     
@@ -45,44 +46,18 @@ final class WebViewViewController: UIViewController {
         setupURLComponents()
         setupProgressView()
         
+        setupKVObserver()
+        
     }
     // MARK: Observer setup
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        /// In case of inherited classes presence the context must not be nil, if the parent class is final - nil for context is ok
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
-        
-        updateProgress()
-    }
-    
-    // MARK: Observer removal
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        webView.removeObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            context: nil)
-    }
-    
-    // MARK: Observer
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey : Any]?,
-        context: UnsafeMutableRawPointer?)
-    {
-        if keyPath == #keyPath(WKWebView.estimatedProgress) {
-            updateProgress()
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
+    private func setupKVObserver() {
+        estimatedProgressObservation = webView.observe(
+            \.estimatedProgress,
+             changeHandler: { [weak self] _, _ in
+                 guard let self = self else { return }
+                 self.updateProgress()
+             })
     }
     
     // MARK: Class methods

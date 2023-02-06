@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
 
@@ -15,17 +16,58 @@ final class ProfileViewController: UIViewController {
     private lazy var userEmailLabel = UILabel()
     private lazy var userDescriptionLabel = UILabel()
     
+    private var profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
+    // MARK: Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         setupUI()
+        updateProfileDetails(profile: profileService.profile)
+        
+        setNotificationObserver()
+        updateAvatar()
         
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
+    
+    // MARK: Observer
+    
+    private func setNotificationObserver() {
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.updateAvatar()
+        }
+    }
+    
+    private func updateProfileDetails(profile: Profile?) {
+        guard let profile = profile else { return }
+        userNameLabel.text = profile.name
+        userEmailLabel.text = profile.loginName
+        userDescriptionLabel.text = profile.bio
+    }
+    
+    private func updateAvatar() {
+        guard let profileImageURL = ProfileImageService.shared.avatarURL,
+              let url = URL(string: profileImageURL)
+        else {
+            return
+        }
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        profileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"), options: [.processor(processor)])
+    }
 
+    // MARK: UI setup
+    
     private func setupUI() {
         
         view.backgroundColor = .ypBlack
@@ -89,8 +131,7 @@ final class ProfileViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             userEmailLabel.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 8),
-            userEmailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            userEmailLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -260),
+            userEmailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
         ])
     }
     
