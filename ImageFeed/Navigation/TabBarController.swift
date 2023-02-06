@@ -17,7 +17,7 @@ final class TabBarController: UITabBarController {
         navVC.navigationBar.isHidden = true
 
         let profileVC = ProfileViewController()
-        profileVC.tabBarItem = UITabBarItem(title: NSLocalizedString("Profile", comment: ""), image: UIImage(named: "tab_profile_active"), tag: 1)
+        profileVC.tabBarItem = UITabBarItem(title: "", image: UIImage(named: "tab_profile_active"), tag: 1)
         
         UITabBar.appearance().tintColor = .ypWhite
         UITabBar.appearance().barTintColor = .ypBlack
