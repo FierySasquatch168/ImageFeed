@@ -106,4 +106,10 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
         return cellHeight
     }
     
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == ImagesListService.shared.photos.count {
+            ImagesListService.shared.fetchPhotosNextPage(with: OAuth2Service.shared.authToken)
+        }
+    }
+    
 }
