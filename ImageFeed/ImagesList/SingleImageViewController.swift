@@ -12,17 +12,26 @@ final class SingleImageViewController: UIViewController {
     var fullImageURL: URL?
     private var alertPresenter: AlertPresenterProtocol?
     
-    lazy var imageView = UIImageView()
-    private lazy var dismissButton = UIButton()
-    private lazy var shareButton = UIButton()
+    lazy var imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.backgroundColor = .ypBlack
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    private lazy var dismissButton: UIButton = {
+        let button = UIButton()
+        return button
+    }()
+    private lazy var shareButton: UIButton = {
+        let button = UIButton()
+        return button
+    }()
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.delegate = self
-        
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
-        
         scrollView.bounces = true
         
         return scrollView
@@ -38,6 +47,11 @@ final class SingleImageViewController: UIViewController {
         
         showFullImage()
         
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        centerImage()
     }
     
     // MARK: @OBJC
@@ -66,8 +80,7 @@ final class SingleImageViewController: UIViewController {
                 switch result {
                 case .success(_):
                     DispatchQueue.main.async {
-                        self.rescaleAndCenterImageInScrollView(imageView: self.imageView)
-                        self.view.layoutIfNeeded()
+                        self.centerImage()
                     }
                 case .failure(_):
                     self.showFullPhotoAlert()
@@ -75,50 +88,44 @@ final class SingleImageViewController: UIViewController {
             }
     }
     
-    // TODO: Check and rewrite
-    private func rescaleAndCenterImageInScrollView(imageView: UIImageView) {
-//        let minZoomScale = scrollView.minimumZoomScale
-//        let maxZoomScale = scrollView.maximumZoomScale
-//        view.layoutIfNeeded()
-//        let visibleRectSize = scrollView.bounds.size
-//        let imageSize = imageView.bounds.size
-//        let hScale = visibleRectSize.width / imageSize.width
-//        let vScale = visibleRectSize.height / imageSize.height
-//        let scale = min(maxZoomScale, max(minZoomScale, max(hScale, vScale)))
-//        scrollView.setZoomScale(scale, animated: false)
-//        scrollView.layoutIfNeeded()
-//        let newContentSize = scrollView.contentSize
-//        let x = (newContentSize.width - visibleRectSize.width) / 2
-//        let y = (newContentSize.height - visibleRectSize.height) / 2
-//        scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
-//        scrollView.layoutIfNeeded()
+    // Centering the image in ScrollView via frameToCenter according to scrollView bounds
+    func centerImage() {
+        let boundsSize = scrollView.bounds.size
+        var frameToCenter = imageView.frame
+        
+        if frameToCenter.size.width < boundsSize.width {
+            frameToCenter.origin.x = (boundsSize.width - frameToCenter.size.width) / 2
+        } else {
+            frameToCenter.origin.x = 0
+        }
+        
+        if frameToCenter.size.height < boundsSize.height {
+            frameToCenter.origin.y = (boundsSize.height - frameToCenter.size.height) / 2
+        } else {
+            frameToCenter.origin.y = 0
+        }
+        
+        imageView.frame = frameToCenter
     }
     
     // MARK: Style
         
     private func setupScrollView() {
         view.addSubview(scrollView)
-        
         scrollView.frame = view.bounds
-        
-        scrollView.minimumZoomScale = 0.1
-        scrollView.maximumZoomScale = 1.25
     }
     
     private func setupImageView() {
         view.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        imageView.backgroundColor = .ypBlack
-        imageView.contentMode = .scaleAspectFill
-        
+
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: view.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             imageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        
+
     }
     
     private func setupDismissButton() {
