@@ -100,10 +100,6 @@ final class ImagesListViewController: UIViewController {
         }
     }
     
-    private func updateLikedPhoto() {
-        
-    }
-    
     // MARK: Style
 
     private func setupTableView() {
@@ -175,7 +171,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
-            imagesListService.changeLike(photoId: photo.id, isLiked: !photo.isLiked) { result in
+            imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { result in
 //                print("imagesListService.changeLike parameters are id: \(photo.id), isLiked:\(photo.isLiked)")
                 switch result {
                 case .success():

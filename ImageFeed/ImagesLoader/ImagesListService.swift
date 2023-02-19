@@ -60,6 +60,7 @@ final class ImagesListService {
         task.resume()
     }
     
+    // MARK: Like change
     func changeLike(photoId: String, isLiked: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
         guard let token = tokenService.authToken else { return }
         let method = isLiked ? "DELETE" : "POST"
@@ -69,7 +70,9 @@ final class ImagesListService {
             + "like",
             httpMethod: method,
             baseURL: defaultBaseURL)
-                
+        
+        print(urlRequest.httpMethod)
+        
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let session = URLSession.shared
@@ -108,7 +111,7 @@ final class ImagesListService {
         task.resume()
     }
     
-    // MARK: Converting
+    // MARK: Converting to viewModel
         
     func convertFetchedModelToViewModel(model: [PhotoResult]) -> [Photo] {
         var photos: [Photo] = []

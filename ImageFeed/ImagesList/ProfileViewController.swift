@@ -7,9 +7,10 @@
 
 import UIKit
 import Kingfisher
+import WebKit
 
 final class ProfileViewController: UIViewController {
-
+    
     private lazy var profileImage = UIImageView()
     private lazy var logoutButton = UIButton()
     private lazy var userNameLabel = UILabel()
@@ -49,6 +50,16 @@ final class ProfileViewController: UIViewController {
         }
     }
     
+    // MARK: Behaviour
+    @objc private func logout() {
+        UIBlockingProgressHUD.show()
+        clearUserDataFromMemory()
+        UIBlockingProgressHUD.dismiss()
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
+        window.rootViewController = AuthViewController()
+        
+    }
+    
     private func updateProfileDetails(profile: Profile?) {
         guard let profile = profile else { return }
         userNameLabel.text = profile.name
@@ -65,7 +76,14 @@ final class ProfileViewController: UIViewController {
         let processor = RoundCornerImageProcessor(cornerRadius: 35)
         profileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"), options: [.processor(processor)])
     }
-
+    
+    private func clearUserDataFromMemory() {
+        // хранилище - удалить токен
+        OAuth2TokenStorage().token = nil
+        // вебвью - удалить куки
+        WebViewViewController.clean()
+    }
+    
     // MARK: UI setup
     
     private func setupUI() {
@@ -99,6 +117,7 @@ final class ProfileViewController: UIViewController {
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
         
         logoutButton.setImage(UIImage(named: "ipad.and.arrow.forward"), for: .normal)
+        logoutButton.addTarget(self, action: #selector(logout), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             logoutButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),

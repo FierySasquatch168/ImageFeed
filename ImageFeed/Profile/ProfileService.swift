@@ -44,6 +44,7 @@ final class ProfileService {
             case .failure(let error):
                 completion(.failure(error))
             case .success(let profileResult):
+                print("fetchProfile profileResult is: \(profileResult)")
                 let profile = Profile(
                     username: profileResult.username,
                     name: "\(profileResult.firstName ?? "") \(profileResult.lastName ?? "")",
