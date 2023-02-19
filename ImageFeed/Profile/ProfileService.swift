@@ -25,7 +25,6 @@ final class ProfileService {
         }
     }
     
-    private let unsplashGetUserURL = "https://unsplash.com/me"
     private(set) var profile: Profile?
     private var task: URLSessionTask?
 

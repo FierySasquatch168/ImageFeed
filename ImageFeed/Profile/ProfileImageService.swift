@@ -19,9 +19,7 @@ final class ProfileImageService {
     struct UserResult: Codable {
         let profileImage: ImageSize
         
-        enum CodingKeys: String, CodingKey {
-            case profileImage = "profile_image"
-        }
+        // MARK: Enum CodingKeys replaced by decoder KeyDecodingStrategy = .convertFromSnakeCase in URL+ Extensions
     }
     
     struct ImageSize: Codable {

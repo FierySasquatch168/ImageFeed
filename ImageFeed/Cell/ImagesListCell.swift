@@ -6,38 +6,66 @@
 //
 
 import UIKit
+import Kingfisher
+
+protocol ImagesListCellDelegate: AnyObject {
+    func imageListCellDidTapLike(_ cell: ImagesListCell)
+}
 
 final class ImagesListCell: UITableViewCell {
     
     static let reuseIdentifier = "ImagesListCell"
+    weak var delegate: ImagesListCellDelegate?
     
     var mainImage = UIImageView()
     var dateLabel = UILabel()
-    var likeButton = UIButton()
+    var likeButton: UIButton = {
+        let button = UIButton()
+        button.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
+        return button
+    }()
     var gradientView: UIImageView = {
         var imageView = UIImageView()
         imageView.image = UIImage(named: "gradient")
         
         return imageView
     }()
+    
+    // MARK: Lifecycle
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super .init(style: style, reuseIdentifier: reuseIdentifier)
         
-        backgroundColor = .clear
+        self.backgroundColor = .clear
         
         configureMainImage()
-        configureLikeButton()
-        
         configureGradientImageView()
         configureDateLabel()
+        configureLikeButton()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: UI Configuration
+    // Guarantee that cells will use correct images
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        mainImage.kf.cancelDownloadTask()
+    }
+    
+    // MARK: Behaviour
+    @objc private func likeButtonTapped() {
+        delegate?.imageListCellDidTapLike(self)
+    }
+    
+    func setIsLiked(isLiked: Bool) {
+        let liked = UIImage(named: "Active")
+        let notLiked = UIImage(named: "No Active")
+        isLiked ? likeButton.setImage(liked, for: .normal) : likeButton.setImage(notLiked, for: .normal)
+    }
+    
+    // MARK: Style
     
     private func configureMainImage() {
         addSubview(mainImage)
@@ -68,7 +96,7 @@ final class ImagesListCell: UITableViewCell {
     }
     
     private func configureLikeButton() {
-        addSubview(likeButton)
+        contentView.addSubview(likeButton)
         likeButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([

@@ -24,6 +24,7 @@ class SplashViewController: UIViewController {
         return imageView
     }()
     
+    // MARK: Lifecycle
     // TODO: override color appearence for dark mode
     
     override func viewDidLoad() {
@@ -48,6 +49,8 @@ class SplashViewController: UIViewController {
         .lightContent
     }
     
+    // MARK: Behaviour
+    
     private func switchToTabBarController() {
         let tabbarVC = TabBarController()
         tabbarVC.modalPresentationStyle = .fullScreen
@@ -66,7 +69,7 @@ class SplashViewController: UIViewController {
         self.present(navVC, animated: true)
     }
     
-    // MARK: UI setup
+    // MARK: Style
     
     private func setupSplashViewLogo() {
         
@@ -79,6 +82,8 @@ class SplashViewController: UIViewController {
         ])
     }
 }
+
+// MARK: Extension AuthVC delegate
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
@@ -129,6 +134,8 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
 }
+
+// MARK: Extension AlertDelegate
 
 extension SplashViewController: AlertPresenterDelegate {
     func showAlert(alert: UIAlertController?) {
