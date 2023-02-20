@@ -37,6 +37,10 @@ final class SingleImageViewController: UIViewController {
         return scrollView
     }()
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -166,6 +170,8 @@ extension SingleImageViewController: UIScrollViewDelegate {
         imageView
     }
 }
+
+// MARK: Extension AlertDelegate
 
 extension SingleImageViewController: AlertPresenterDelegate {
     func showAlert(alert: UIAlertController?) {

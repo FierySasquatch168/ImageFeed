@@ -7,39 +7,88 @@
 
 import UIKit
 import Kingfisher
-import WebKit
 
 final class ProfileViewController: UIViewController {
     
-    private lazy var profileImage = UIImageView()
-    private lazy var logoutButton = UIButton()
-    private lazy var userNameLabel = UILabel()
-    private lazy var userEmailLabel = UILabel()
-    private lazy var userDescriptionLabel = UILabel()
+    private lazy var profileImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        imageView.image = UIImage(named: "person.crop.circle.fill")
+        imageView.backgroundColor = .clear
+        
+        NSLayoutConstraint.activate([
+            imageView.heightAnchor.constraint(equalToConstant: 70),
+            imageView.widthAnchor.constraint(equalToConstant: 70)
+        ])
+        
+        return imageView
+    }()
+    private lazy var logoutButton: UIButton = {
+        let button = UIButton()
+        return button
+    }()
+    private lazy var userNameLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 23, weight: .bold)
+        label.textColor = .ypWhite
+        label.text = "Екатерина Новикова"
+        
+        return label
+    }()
+    private lazy var userEmailLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 13, weight: .regular)
+        label.textColor = .ypGrey
+        label.text = "@ekaterina.nov"
+        
+        return label
+    }()
+    private lazy var userDescriptionLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 13, weight: .regular)
+        label.textColor = .ypWhite
+        label.text = "Hello, world!"
+        
+        return label
+    }()
+    
+    private lazy var mainStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 8
+        stackView.alignment = .leading
+        stackView.distribution = .fill
+        
+        stackView.addArrangedSubview(profileImage)
+        stackView.addArrangedSubview(userNameLabel)
+        stackView.addArrangedSubview(userEmailLabel)
+        stackView.addArrangedSubview(userDescriptionLabel)
+        
+        return stackView
+    }()
     
     private var profileService = ProfileService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
+    
+    private var animationLayers: [CALayer] = []
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
+    }
     
     // MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
+        
         updateProfileDetails(profile: profileService.profile)
-        
-        setNotificationObserver()
-        updateAvatar()
-        
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        .lightContent
+                
     }
     
     // MARK: Observer
     
-    private func setNotificationObserver() {
+    func setNotificationObserver() {
         profileImageServiceObserver = NotificationCenter.default.addObserver(
             forName: ProfileImageService.didChangeNotification,
             object: nil,
@@ -47,6 +96,8 @@ final class ProfileViewController: UIViewController {
         ) { [weak self] _ in
             guard let self = self else { return }
             self.updateAvatar()
+            self.removeGradientsFromSuperLayer()
+            print("ProfileViewController setNotificationObserver finished work")
         }
     }
     
@@ -74,7 +125,52 @@ final class ProfileViewController: UIViewController {
             return
         }
         let processor = RoundCornerImageProcessor(cornerRadius: 35)
-        profileImage.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"), options: [.processor(processor)])
+        profileImage.kf.setImage(with: url, options: [.processor(processor)])
+    }
+    
+    // MARK: Проверить, почему не удаляется из вью
+    
+    private func setupAnimatedGradientLayers() {
+        profileImage.layer.addSublayer(createCAGradientLayer(width: 70, height: 70))
+        userNameLabel.layer.addSublayer(createCAGradientLayer(width: 223, height: 24))
+        userEmailLabel.layer.addSublayer(createCAGradientLayer(width: 89, height: 24))
+        userDescriptionLabel.layer.addSublayer(createCAGradientLayer(width: 67, height: 24))
+        
+    }
+    
+    private func createCAGradientLayer(width: Double, height: Double) -> CAGradientLayer {
+        let gradient = CAGradientLayer()
+        gradient.frame = CGRect(origin: .zero, size: CGSize(width: width, height: height))
+        gradient.locations = [0, 0.1, 0.3]
+        gradient.colors = [
+            UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
+            UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
+            UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
+        ]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.cornerRadius = height / 2
+        gradient.masksToBounds = true
+        
+        setupAnimationOfCAGradientLayer(for: gradient)
+        animationLayers.append(gradient)
+        
+        return gradient
+    }
+    
+    private func setupAnimationOfCAGradientLayer(for layer: CAGradientLayer) {
+        let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
+        gradientChangeAnimation.duration = 1.0
+        gradientChangeAnimation.repeatCount = .infinity
+        gradientChangeAnimation.fromValue = [0, 0.1, 0.3]
+        gradientChangeAnimation.toValue = [0, 0.8, 1]
+        layer.add(gradientChangeAnimation, forKey: "locations")
+    }
+    
+    private func removeGradientsFromSuperLayer() {
+        for index in 0..<animationLayers.count {
+            animationLayers[index].removeFromSuperlayer()
+        }
     }
     
     private func clearUserDataFromMemory() {
@@ -90,25 +186,18 @@ final class ProfileViewController: UIViewController {
         
         view.backgroundColor = .ypBlack
         
-        setupProfileImage()
+        setupStackView()
         setupLogoutButton()
-        setupUserNameLabel()
-        setupUserEmail()
-        setupUserDescription()
         
     }
     
-    private func setupProfileImage() {
-        view.addSubview(profileImage)
-        profileImage.translatesAutoresizingMaskIntoConstraints = false
-        
-        profileImage.image = UIImage(named: "person.crop.circle.fill")
+    private func setupStackView() {
+        view.addSubview(mainStackView)
+        mainStackView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            profileImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 76),
-            profileImage.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            profileImage.heightAnchor.constraint(equalToConstant: 70),
-            profileImage.widthAnchor.constraint(equalToConstant: 70)
+            mainStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
+            mainStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
         ])
     }
     
@@ -121,51 +210,10 @@ final class ProfileViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             logoutButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
-            logoutButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -26),
+            logoutButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -26)
         ])
     }
     
-    private func setupUserNameLabel() {
-        view.addSubview(userNameLabel)
-        userNameLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        userNameLabel.font = .systemFont(ofSize: 23, weight: .bold)
-        userNameLabel.textColor = .ypWhite
-        userNameLabel.text = "Екатерина Новикова"
-        
-        NSLayoutConstraint.activate([
-            userNameLabel.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: 8),
-            userNameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            userNameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -124),
-        ])
-    }
     
-    private func setupUserEmail() {
-        view.addSubview(userEmailLabel)
-        userEmailLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        userEmailLabel.font = .systemFont(ofSize: 13, weight: .regular)
-        userEmailLabel.textColor = .ypGrey
-        userEmailLabel.text = "@ekaterina.nov"
-        
-        NSLayoutConstraint.activate([
-            userEmailLabel.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 8),
-            userEmailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
-        ])
-    }
     
-    private func setupUserDescription() {
-        view.addSubview(userDescriptionLabel)
-        userDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        userDescriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
-        userDescriptionLabel.textColor = .ypWhite
-        userDescriptionLabel.text = "Hello, world!"
-        
-        NSLayoutConstraint.activate([
-            userDescriptionLabel.topAnchor.constraint(equalTo: userEmailLabel.bottomAnchor, constant: 8),
-            userDescriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            userDescriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -282),
-        ])
-    }
 }
