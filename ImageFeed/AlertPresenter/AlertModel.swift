@@ -12,5 +12,6 @@ struct AlertModel {
     let message: String
     let buttonText: String
     var actionText: String? = nil
-    var completion: ((UIAlertAction) -> Void)? = nil
+    var leftCompletion: ((UIAlertAction)-> Void)? = nil
+    var rightCompletion: ((UIAlertAction) -> Void)? = nil
 }

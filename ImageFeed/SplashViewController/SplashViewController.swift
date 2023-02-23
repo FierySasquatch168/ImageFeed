@@ -53,7 +53,6 @@ class SplashViewController: UIViewController {
     
     private func switchToTabBarController() {
         let tabbarVC = TabBarController()
-        tabbarVC.modalPresentationStyle = .fullScreen
         
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
         window.rootViewController = tabbarVC
@@ -126,7 +125,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                         print(imageName)
                     }
                 }
-            case .failure(let error):
+            case .failure(_):
                 // TODO: Show alert
                 UIBlockingProgressHUD.dismiss()
                 self.showAuthErrorAlert()

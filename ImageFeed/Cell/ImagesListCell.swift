@@ -17,14 +17,14 @@ final class ImagesListCell: UITableViewCell {
     static let reuseIdentifier = "ImagesListCell"
     weak var delegate: ImagesListCellDelegate?
     
-    var mainImage = UIImageView()
-    var dateLabel = UILabel()
-    var likeButton: UIButton = {
+    lazy var mainImage = UIImageView()
+    lazy var dateLabel = UILabel()
+    private lazy var likeButton: UIButton = {
         let button = UIButton()
         button.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
         return button
     }()
-    var gradientView: UIImageView = {
+    private lazy var dateGradientView: UIImageView = {
         var imageView = UIImageView()
         imageView.image = UIImage(named: "gradient")
         
@@ -37,11 +37,12 @@ final class ImagesListCell: UITableViewCell {
         super .init(style: style, reuseIdentifier: reuseIdentifier)
         
         self.backgroundColor = .clear
-        
         configureMainImage()
         configureGradientImageView()
         configureDateLabel()
         configureLikeButton()
+        
+        
     }
     
     required init?(coder: NSCoder) {
@@ -52,6 +53,9 @@ final class ImagesListCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         mainImage.kf.cancelDownloadTask()
+        dateLabel.text = nil
+        likeButton.imageView?.image = nil
+        dateGradientView.image = nil
     }
     
     // MARK: Behaviour
@@ -90,8 +94,8 @@ final class ImagesListCell: UITableViewCell {
         dateLabel.textColor = .white
         
         NSLayoutConstraint.activate([
-            dateLabel.leadingAnchor.constraint(equalTo: mainImage.leadingAnchor, constant: 8),
-            dateLabel.bottomAnchor.constraint(equalTo: mainImage.bottomAnchor, constant: -8)
+            dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         ])
     }
     
@@ -100,20 +104,20 @@ final class ImagesListCell: UITableViewCell {
         likeButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            likeButton.topAnchor.constraint(equalTo: mainImage.topAnchor, constant: 12),
-            likeButton.trailingAnchor.constraint(equalTo: mainImage.trailingAnchor, constant: -10.5)
+            likeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            likeButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10.5)
         ])
     }
     
     private func configureGradientImageView() {
-        addSubview(gradientView)
-        gradientView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(dateGradientView)
+        dateGradientView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            gradientView.leadingAnchor.constraint(equalTo: mainImage.leadingAnchor),
-            gradientView.trailingAnchor.constraint(equalTo: mainImage.trailingAnchor),
-            gradientView.bottomAnchor.constraint(equalTo: mainImage.bottomAnchor),
-            gradientView.heightAnchor.constraint(equalToConstant: 30)
+            dateGradientView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            dateGradientView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            dateGradientView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            dateGradientView.heightAnchor.constraint(equalToConstant: 30)
         ])
     }
 }

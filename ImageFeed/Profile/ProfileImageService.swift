@@ -42,13 +42,14 @@ final class ProfileImageService {
             case .failure(let error):
                 completion(.failure(error))
             case .success(let imagePack):
-                let smallImage = imagePack.profileImage.small
-                self.avatarURL = smallImage
-                completion(.success(smallImage))
+                let mediumImage = imagePack.profileImage.medium
+                self.avatarURL = mediumImage
+                completion(.success(mediumImage))
                 NotificationCenter.default.post(
                     name: ProfileImageService.didChangeNotification,
                     object: self,
-                    userInfo: ["URL": smallImage])
+                    userInfo: ["URL": mediumImage])
+                print("ProfileImageService.didChangeNotification posted")
             }
         }
         

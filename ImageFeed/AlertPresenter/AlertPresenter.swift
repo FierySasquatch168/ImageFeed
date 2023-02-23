@@ -25,7 +25,8 @@ struct AlertPresenter: AlertPresenterProtocol {
         
         let action = UIAlertAction(
             title: alert.buttonText,
-            style: .cancel)
+            style: .cancel,
+            handler: alert.leftCompletion)
         
         customAlert.addAction(action)
         
@@ -33,13 +34,15 @@ struct AlertPresenter: AlertPresenterProtocol {
             let secondAction = UIAlertAction(
                 title: actionText,
                 style: .default,
-                handler: alert.completion)
+                handler: alert.rightCompletion)
             
             customAlert.addAction(secondAction)
         }
         
         alertDelegate?.showAlert(alert: customAlert)
     }
+    
+    
     
     
 }

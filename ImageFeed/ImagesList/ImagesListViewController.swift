@@ -9,9 +9,12 @@ import UIKit
 import Kingfisher
 
 final class ImagesListViewController: UIViewController {
+    
     private var imagesListService = ImagesListService.shared
     private var imagesLoaderObserver: NSObjectProtocol?
     private var alertPresenter: AlertPresenterProtocol?
+    
+    private var photos: [Photo] = []
 
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
@@ -25,8 +28,6 @@ final class ImagesListViewController: UIViewController {
         return tableView
     }()
     
-    private var photosName: [String] = Array(0..<20).compactMap{ "\($0)" }
-    private var photos: [Photo] = []
     private lazy var dateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -71,19 +72,18 @@ final class ImagesListViewController: UIViewController {
         else {
             return
         }
-        cell.mainImage.kf.setImage(
-            with: url,
-            placeholder: stubImage) { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success(_):
-                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                case .failure(let error):
-                    print(error)
+            cell.mainImage.kf.setImage(
+                with: url, placeholder: stubImage) { [weak self] result in
+                    guard let self = self else { return }
+                    switch result {
+                    case .success(_):
+                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    case .failure(let error):
+                        print(error)
+                    }
                 }
-            }
-        cell.dateLabel.text = dateFormatter.string(from: date)
-        cell.setIsLiked(isLiked: photos[indexPath.row].isLiked)
+            cell.dateLabel.text = self.dateFormatter.string(from: date)
+            cell.setIsLiked(isLiked: self.photos[indexPath.row].isLiked)
     }
     
     private func updateTableViewAnimated() {
@@ -99,6 +99,8 @@ final class ImagesListViewController: UIViewController {
             }
         }
     }
+    
+   
     
     // MARK: Style
 
@@ -172,7 +174,6 @@ extension ImagesListViewController: ImagesListCellDelegate {
         let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
             imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { result in
-//                print("imagesListService.changeLike parameters are id: \(photo.id), isLiked:\(photo.isLiked)")
                 switch result {
                 case .success():
                     DispatchQueue.main.async {
