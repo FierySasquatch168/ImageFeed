@@ -26,12 +26,12 @@ final class ImagesListService {
     
     // MARK: Behaviour
     
-    func fetchPhotosNextPage(with token: String?) {
-        guard let token = token else { return }
+    func fetchPhotosNextPage() {
+        guard let token = tokenService.authToken else { return }
         let nextPage = lastLoadedPage == nil ? 1 : lastLoadedPage! + 1
+        if task != nil { return }
         lastLoadedPage = nextPage
-        task?.cancel()
-        
+                
         var urlRequest = URLRequest.makeHTTPRequest(
             path: "/photos"
             + "?page=\(nextPage)"
@@ -54,6 +54,7 @@ final class ImagesListService {
             case .failure(let error):
                 print(error)
                 self.task = nil
+                return
             }
         }
         self.task = task
@@ -70,9 +71,7 @@ final class ImagesListService {
             + "like",
             httpMethod: method,
             baseURL: defaultBaseURL)
-        
-        print(urlRequest.httpMethod)
-        
+                
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let session = URLSession.shared
@@ -87,7 +86,7 @@ final class ImagesListService {
                 completion(.failure(NetworkError.httpStatusCode(response.statusCode)))
             }
             
-            if let data = data {
+            if data != nil {
                 DispatchQueue.main.async {
                 if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
                     let photo = self.photos[index]
@@ -102,7 +101,6 @@ final class ImagesListService {
                         isLiked: !photo.isLiked)
                     
                         self.photos[index] = newPhoto
-//                        print("changeLike success")
                     }
                 }
                 completion(.success(()))

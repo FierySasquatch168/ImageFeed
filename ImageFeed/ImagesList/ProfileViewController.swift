@@ -119,7 +119,7 @@ final class ProfileViewController: UIViewController {
     
     private func updateProfileDetails(profile: Profile?) {
         guard let profile = profile else { return }
-        userNameLabel.text = profile.name
+        userNameLabel.text = profile.username
         userEmailLabel.text = profile.loginName
         userDescriptionLabel.text = profile.bio
     }

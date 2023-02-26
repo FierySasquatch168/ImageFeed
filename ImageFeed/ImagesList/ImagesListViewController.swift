@@ -47,7 +47,7 @@ final class ImagesListViewController: UIViewController {
         view.backgroundColor = .ypBlack
         setupTableView()
         setNotificationObserver()
-        imagesListService.fetchPhotosNextPage(with: OAuth2Service.shared.authToken)
+        imagesListService.fetchPhotosNextPage()
         
     }
     
@@ -100,8 +100,6 @@ final class ImagesListViewController: UIViewController {
         }
     }
     
-   
-    
     // MARK: Style
 
     private func setupTableView() {
@@ -144,7 +142,6 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if photos.count == 0 {
-            print("photos.count = 0")
             return 0
         }
         
@@ -160,7 +157,7 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == ImagesListService.shared.photos.count-1 {
-                    ImagesListService.shared.fetchPhotosNextPage(with: OAuth2Service.shared.authToken)
+                    ImagesListService.shared.fetchPhotosNextPage()
                 }
     }
     
@@ -176,7 +173,8 @@ extension ImagesListViewController: ImagesListCellDelegate {
             imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { result in
                 switch result {
                 case .success():
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
                         // Synchronize the arrays of photos
                         self.photos = self.imagesListService.photos
                         // Change the like image
@@ -185,13 +183,10 @@ extension ImagesListViewController: ImagesListCellDelegate {
                         UIBlockingProgressHUD.dismiss()
                     }
                     
-                case .failure(let error):
+                case .failure(_):
                     UIBlockingProgressHUD.dismiss()
                     // TODO: Show alert
                     self.showLikeErrorAlert()
-                    print(error)
-                    
-                
             }
         }
     }

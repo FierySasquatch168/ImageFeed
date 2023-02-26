@@ -30,28 +30,20 @@ extension URLSession {
                let statusCode = (response as? HTTPURLResponse)?.statusCode {
                 if 200..<300 ~= statusCode {
                     do {
-//                        print("data=data, response=response, status code in 200..<300")
-//                        print("Response is: \(response)")
-//                        print("Status code is: \(statusCode)")
                         let decoder = JSONDecoder()
                         decoder.keyDecodingStrategy = .convertFromSnakeCase
                         decoder.dateDecodingStrategy = .iso8601
                         let result = try decoder.decode(T.self, from: data)
                         fulfillmentCompletionOnMainThread(.success(result))
                     } catch {
-//                        print("Caught error while useing decoder, error is: \(error)")
                         fulfillmentCompletionOnMainThread(.failure(error))
                     }
                 } else {
-//                    print("data != data or response != response, or status code !in 200..<300")
-//                    print("Status code is: \(statusCode)")
                     fulfillmentCompletionOnMainThread(.failure(NetworkError.httpStatusCode(statusCode)))
                 }
             } else if let error = error {
-//                print("URL Request error")
                 fulfillmentCompletionOnMainThread(.failure(NetworkError.urlRequestError(error)))
             } else {
-//                print("Network error")
                 fulfillmentCompletionOnMainThread(.failure(NetworkError.urlSessionError))
             }
         }
