@@ -5,11 +5,12 @@
 //  Created by Aleksandr Eliseev on 02.02.2023.
 //
 
-import Foundation
+import UIKit
 
 final class ProfileImageService {
     
     static let shared = ProfileImageService()
+    private var alertPresenter: AlertPresenterProtocol?
     static let didChangeNotification = Notification.Name("ProfileImageProviderDidChange")
     
     private(set) var avatarURL: String?
@@ -40,6 +41,7 @@ final class ProfileImageService {
             guard let self = self else { return }
             switch result {
             case .failure(let error):
+                self.showErrorAlert(with: error)
                 completion(.failure(error))
             case .success(let imagePack):
                 let mediumImage = imagePack.profileImage.medium
@@ -69,5 +71,24 @@ final class ProfileImageService {
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         return urlRequest
+    }
+}
+
+extension ProfileImageService: AlertPresenterDelegate {
+    func showAlert(alert: UIAlertController?) {
+        guard let alert = alert else { return }
+        UIApplication.topViewController()?.present(alert, animated: true)
+    }
+    
+    func showErrorAlert(with error: Error) {
+        
+        let alert = AlertModel(
+            title: "Ошибка",
+            message: error.localizedDescription,
+            buttonText: "OK")
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+        
     }
 }

@@ -9,6 +9,7 @@ import UIKit
 
 final class ImagesListService {
     static var shared = ImagesListService()
+    private var alertPresenter: AlertPresenterProtocol?
     static let DidChangeNotification = Notification.Name("ImagesListServiceDidChange")
     
     private var photosPerPage: Int = 10
@@ -46,13 +47,14 @@ final class ImagesListService {
             guard let self = self else { return }
             switch result {
             case .success(let photoResult):
-                DispatchQueue.main.async {
+                DispatchQueue.main.async {  [weak self] in
+                    guard let self = self else { return }
                     let photos = self.convertFetchedModelToViewModel(model: photoResult)
                     self.photos += photos
                     self.task = nil
                 }
             case .failure(let error):
-                print(error)
+                self.showErrorAlert(with: error)
                 self.task = nil
                 return
             }
@@ -75,19 +77,21 @@ final class ImagesListService {
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let session = URLSession.shared
-        let task = session.dataTask(with: urlRequest) { data, response, error in
+        let task = session.dataTask(with: urlRequest) { [weak self] data, response, error in
+            guard let self = self else { return }
             if let error = error {
-                print(error)
+                self.showErrorAlert(with: error)
                 completion(.failure(error))
             }
             
             if let response = response as? HTTPURLResponse, response.statusCode < 200 || response.statusCode >= 300 {
-                print(response.statusCode)
+                self.showErrorAlert(with: NetworkError.httpStatusCode(response.statusCode))
                 completion(.failure(NetworkError.httpStatusCode(response.statusCode)))
             }
             
             if data != nil {
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
                 if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
                     let photo = self.photos[index]
                     let newPhoto = Photo(
@@ -137,3 +141,25 @@ final class ImagesListService {
         return CGSize(width: itemWidth, height: itemHeight)
     }
 }
+
+// MARK: Extension AlertDelegate
+
+extension ImagesListService: AlertPresenterDelegate {
+    func showAlert(alert: UIAlertController?) {
+        guard let alert = alert else { return }
+        UIApplication.topViewController()?.present(alert, animated: true)
+    }
+    
+    func showErrorAlert(with error: Error) {
+        
+        let alert = AlertModel(
+            title: "Ошибка",
+            message: error.localizedDescription,
+            buttonText: "OK")
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+        
+    }
+}
+

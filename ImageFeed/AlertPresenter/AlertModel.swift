@@ -10,6 +10,7 @@ import UIKit
 struct AlertModel {
     let title: String
     let message: String
+    let error: String? = nil
     let buttonText: String
     var actionText: String? = nil
     var leftCompletion: ((UIAlertAction)-> Void)? = nil

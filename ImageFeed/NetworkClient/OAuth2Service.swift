@@ -16,6 +16,7 @@ enum NetworkError: Error {
 final class OAuth2Service {
     
     static let shared = OAuth2Service()
+    private var alertPresenter: AlertPresenterProtocol?
     
     private var lastCode: String?
     private var task: URLSessionTask?
@@ -72,4 +73,26 @@ final class OAuth2Service {
             httpMethod: "POST",
             baseURL: URL(string: "https://unsplash.com")!)
     }
+}
+
+// MARK: Extension AlertDelegate
+
+extension OAuth2Service: AlertPresenterDelegate {
+    func showAlert(alert: UIAlertController?) {
+        guard let alert = alert else { return }
+        UIApplication.topViewController()?.present(alert, animated: true)
+    }
+    
+    func showErrorAlert(with error: Error) {
+        
+        let alert = AlertModel(
+            title: "Ошибка",
+            message: error.localizedDescription,
+            buttonText: "OK")
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+        
+    }
+    
 }

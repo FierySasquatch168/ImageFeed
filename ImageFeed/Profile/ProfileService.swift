@@ -10,6 +10,7 @@ import UIKit
 final class ProfileService {
     
     static let shared = ProfileService()
+    private var alertPresenter: AlertPresenterProtocol?
     
     struct ProfileResult: Decodable {
         let username: String?
@@ -42,9 +43,9 @@ final class ProfileService {
             }
             switch result {
             case .failure(let error):
+                self.showErrorAlert(with: error)
                 completion(.failure(error))
             case .success(let profileResult):
-                print("fetchProfile profileResult is: \(profileResult)")
                 let profile = Profile(
                     username: profileResult.username,
                     name: "\(profileResult.firstName ?? "") \(profileResult.lastName ?? "")",
@@ -71,3 +72,25 @@ final class ProfileService {
         return urlRequest
     }
 }
+
+// MARK: Extension AlertDelegate
+
+extension ProfileService: AlertPresenterDelegate {
+    func showAlert(alert: UIAlertController?) {
+        guard let alert = alert else { return }
+        UIApplication.topViewController()?.present(alert, animated: true)
+    }
+    
+    func showErrorAlert(with error: Error) {
+        
+        let alert = AlertModel(
+            title: "Ошибка",
+            message: error.localizedDescription,
+            buttonText: "OK")
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+        
+    }
+}
+

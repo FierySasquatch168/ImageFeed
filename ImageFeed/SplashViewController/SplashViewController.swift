@@ -113,14 +113,14 @@ extension SplashViewController: AuthViewControllerDelegate {
             switch result {
             case .success(let profile):
                 guard let username = profile.username else { return }
-                ProfileImageService.shared.fetchProfileImageURL(username: username) { result in
-                    
+                ProfileImageService.shared.fetchProfileImageURL(username: username) { [weak self] result in
+                    guard let self = self else { return }
                     UIBlockingProgressHUD.dismiss()
                     self.switchToTabBarController()
                     
                     switch result {
                     case .failure(let error):
-                        print(error)
+                        self.showErrorAlert(with: error)
                     case .success(let imageName):
                         print(imageName)
                     }
@@ -147,6 +147,18 @@ extension SplashViewController: AlertPresenterDelegate {
         let alert = AlertModel(
             title: "Что-то пошло не так(",
             message: "Не удалось войти в систему",
+            buttonText: "OK")
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+        
+    }
+    
+    func showErrorAlert(with error: Error) {
+        
+        let alert = AlertModel(
+            title: "Ошибка",
+            message: error.localizedDescription,
             buttonText: "OK")
         
         alertPresenter = AlertPresenter(alertDelegate: self)
