@@ -49,7 +49,7 @@ class SplashViewController: UIViewController {
         .lightContent
     }
     
-    // MARK: Behaviour
+    // MARK: Behavior
     
     private func switchToTabBarController() {
         let tabbarVC = TabBarController()

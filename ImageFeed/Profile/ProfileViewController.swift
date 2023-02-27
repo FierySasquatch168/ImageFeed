@@ -105,7 +105,7 @@ final class ProfileViewController: UIViewController {
         }
     }
     
-    // MARK: Behaviour
+    // MARK: Behavior
     @objc private func logout() {
         showLogoutAlert()
     }

@@ -101,6 +101,7 @@
 				370F7533298C0977002B4D31 /* ProfileService.swift */,
 				370F7537298C46BE002B4D31 /* Profile.swift */,
 				370F7539298C64CB002B4D31 /* ProfileImageService.swift */,
+				37434393295DCC8C0050668F /* ProfileViewController.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -173,7 +174,6 @@
 			isa = PBXGroup;
 			children = (
 				37C938DA294E34930068B964 /* ImagesListViewController.swift */,
-				37434393295DCC8C0050668F /* ProfileViewController.swift */,
 				37305296295F3485004B089F /* SingleImageViewController.swift */,
 			);
 			path = ImagesList;

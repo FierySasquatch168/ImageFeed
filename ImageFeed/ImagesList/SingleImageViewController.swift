@@ -184,10 +184,10 @@ extension SingleImageViewController: AlertPresenterDelegate {
             title: "Ошибка загрузки",
             message: "Что-то пошло не так. Попробовать ещё раз?",
             buttonText: "Не нужно",
-            actionText: "Повторить") { [weak self] _ in
+            actionText: "Повторить", rightCompletion:  { [weak self] _ in
                 guard let self = self else { return }
                 self.showFullImage()
-            }
+            })
         
         alertPresenter = AlertPresenter(alertDelegate: self)
         alertPresenter?.presentAlertController(alert: alert)

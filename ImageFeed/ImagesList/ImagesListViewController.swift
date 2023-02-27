@@ -157,8 +157,8 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == ImagesListService.shared.photos.count-1 {
-                    ImagesListService.shared.fetchPhotosNextPage()
-                }
+            ImagesListService.shared.fetchPhotosNextPage()
+        }
     }
     
 }
@@ -170,7 +170,8 @@ extension ImagesListViewController: ImagesListCellDelegate {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
-            imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { result in
+            imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { [weak self] result in
+                guard let self = self else { return }
                 switch result {
                 case .success():
                     DispatchQueue.main.async { [weak self] in

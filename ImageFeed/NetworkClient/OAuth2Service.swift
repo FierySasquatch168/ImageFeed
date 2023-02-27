@@ -50,6 +50,7 @@ final class OAuth2Service {
                 self.task = nil
                 self.lastCode = nil
             case .failure(let error):
+                self.showErrorAlert(with: error)
                 completion(.failure(error))
                 self.task = nil
                 self.lastCode = nil

@@ -51,7 +51,6 @@ final class ProfileImageService {
                     name: ProfileImageService.didChangeNotification,
                     object: self,
                     userInfo: ["URL": mediumImage])
-                print("ProfileImageService.didChangeNotification posted")
             }
         }
         

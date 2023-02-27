@@ -25,7 +25,7 @@ final class ImagesListService {
     private var task: URLSessionTask?
     private var tokenService = OAuth2Service.shared
     
-    // MARK: Behaviour
+    // MARK: Behavior
     
     func fetchPhotosNextPage() {
         guard let token = tokenService.authToken else { return }
