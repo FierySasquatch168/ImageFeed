@@ -23,6 +23,7 @@ class OAuth2TokenStorage {
             }
             let isSuccess = keychainWrapper.set(token, forKey: "token")
             guard isSuccess else {
+                print("OAuth2TokenStorage token setting error")
                 return
             }
         }

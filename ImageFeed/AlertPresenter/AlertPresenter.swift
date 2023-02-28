@@ -21,16 +21,28 @@ struct AlertPresenter: AlertPresenterProtocol {
             message: alert.message,
             preferredStyle: .alert)
         
-        customAlert.view.accessibilityIdentifier = "NetworkErrorAlert"
+        customAlert.view.accessibilityIdentifier = "Alert"
         
         let action = UIAlertAction(
             title: alert.buttonText,
-            style: .cancel)
+            style: .cancel,
+            handler: alert.leftCompletion)
         
         customAlert.addAction(action)
         
+        if let actionText = alert.actionText {
+            let secondAction = UIAlertAction(
+                title: actionText,
+                style: .default,
+                handler: alert.rightCompletion)
+            
+            customAlert.addAction(secondAction)
+        }
+        
         alertDelegate?.showAlert(alert: customAlert)
     }
+    
+    
     
     
 }

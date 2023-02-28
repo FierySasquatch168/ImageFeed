@@ -10,6 +10,7 @@ import UIKit
 final class ProfileService {
     
     static let shared = ProfileService()
+    private var alertPresenter: AlertPresenterProtocol?
     
     struct ProfileResult: Decodable {
         let username: String?
@@ -25,7 +26,6 @@ final class ProfileService {
         }
     }
     
-    private let unsplashGetUserURL = "https://unsplash.com/me"
     private(set) var profile: Profile?
     private var task: URLSessionTask?
 
@@ -43,6 +43,7 @@ final class ProfileService {
             }
             switch result {
             case .failure(let error):
+                self.showErrorAlert(with: error)
                 completion(.failure(error))
             case .success(let profileResult):
                 let profile = Profile(
@@ -71,3 +72,25 @@ final class ProfileService {
         return urlRequest
     }
 }
+
+// MARK: Extension AlertDelegate
+
+extension ProfileService: AlertPresenterDelegate {
+    func showAlert(alert: UIAlertController?) {
+        guard let alert = alert else { return }
+        UIApplication.topViewController()?.present(alert, animated: true)
+    }
+    
+    func showErrorAlert(with error: Error) {
+        
+        let alert = AlertModel(
+            title: "Ошибка",
+            message: error.localizedDescription,
+            buttonText: "OK")
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+        
+    }
+}
+

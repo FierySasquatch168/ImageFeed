@@ -24,6 +24,7 @@ class SplashViewController: UIViewController {
         return imageView
     }()
     
+    // MARK: Lifecycle
     // TODO: override color appearence for dark mode
     
     override func viewDidLoad() {
@@ -48,9 +49,10 @@ class SplashViewController: UIViewController {
         .lightContent
     }
     
+    // MARK: Behavior
+    
     private func switchToTabBarController() {
         let tabbarVC = TabBarController()
-        tabbarVC.modalPresentationStyle = .fullScreen
         
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
         window.rootViewController = tabbarVC
@@ -66,7 +68,7 @@ class SplashViewController: UIViewController {
         self.present(navVC, animated: true)
     }
     
-    // MARK: UI setup
+    // MARK: Style
     
     private func setupSplashViewLogo() {
         
@@ -79,6 +81,8 @@ class SplashViewController: UIViewController {
         ])
     }
 }
+
+// MARK: Extension AuthVC delegate
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
@@ -109,19 +113,19 @@ extension SplashViewController: AuthViewControllerDelegate {
             switch result {
             case .success(let profile):
                 guard let username = profile.username else { return }
-                ProfileImageService.shared.fetchProfileImageURL(username: username) { result in
-                    
+                ProfileImageService.shared.fetchProfileImageURL(username: username) { [weak self] result in
+                    guard let self = self else { return }
                     UIBlockingProgressHUD.dismiss()
                     self.switchToTabBarController()
                     
                     switch result {
                     case .failure(let error):
-                        print(error)
+                        self.showErrorAlert(with: error)
                     case .success(let imageName):
                         print(imageName)
                     }
                 }
-            case .failure(let error):
+            case .failure(_):
                 // TODO: Show alert
                 UIBlockingProgressHUD.dismiss()
                 self.showAuthErrorAlert()
@@ -129,6 +133,8 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
 }
+
+// MARK: Extension AlertDelegate
 
 extension SplashViewController: AlertPresenterDelegate {
     func showAlert(alert: UIAlertController?) {
@@ -141,6 +147,18 @@ extension SplashViewController: AlertPresenterDelegate {
         let alert = AlertModel(
             title: "Что-то пошло не так(",
             message: "Не удалось войти в систему",
+            buttonText: "OK")
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+        
+    }
+    
+    func showErrorAlert(with error: Error) {
+        
+        let alert = AlertModel(
+            title: "Ошибка",
+            message: error.localizedDescription,
             buttonText: "OK")
         
         alertPresenter = AlertPresenter(alertDelegate: self)

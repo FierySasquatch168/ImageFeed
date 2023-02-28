@@ -9,28 +9,37 @@ import UIKit
 
 final class SingleImageViewController: UIViewController {
     
-    var image: UIImage! {
-        didSet {
-            guard let image = image else { return }
-            rescaleAndCenterImageInScrollView(image: image)
-        }
-    }
+    var fullImageURL: URL?
+    private var alertPresenter: AlertPresenterProtocol?
     
-    private lazy var imageView = UIImageView()
-    private lazy var dismissButton = UIButton()
-    private lazy var shareButton = UIButton()
+    lazy var imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.backgroundColor = .ypBlack
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    private lazy var dismissButton: UIButton = {
+        let button = UIButton()
+        return button
+    }()
+    private lazy var shareButton: UIButton = {
+        let button = UIButton()
+        return button
+    }()
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.delegate = self
-        
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
-        
         scrollView.bounces = true
         
         return scrollView
     }()
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,9 +49,16 @@ final class SingleImageViewController: UIViewController {
         setupDismissButton()
         setupShareButton()
         
-        rescaleAndCenterImageInScrollView(image: image)
+        showFullImage()
         
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        centerImage()
+    }
+    
+    // MARK: @OBJC
     
     @objc private func dismissButtonTapped() {
         dismiss(animated: true, completion: nil)
@@ -50,58 +66,70 @@ final class SingleImageViewController: UIViewController {
     
     @objc private func didTapShareButton() {
         let share = UIActivityViewController(
-            activityItems: [image],
+            activityItems: [imageView.image],
             applicationActivities: nil
         )
         present(share, animated: true, completion: nil)
     }
     
-    // MARK: Private funcs
+    // MARK: Behaviour
     
-    private func rescaleAndCenterImageInScrollView(image: UIImage) {
-        let minZoomScale = scrollView.minimumZoomScale
-        let maxZoomScale = scrollView.maximumZoomScale
-        view.layoutIfNeeded()
-        let visibleRectSize = scrollView.bounds.size
-        let imageSize = image.size
-        let hScale = visibleRectSize.width / imageSize.width
-        let vScale = visibleRectSize.height / imageSize.height
-        let scale = min(maxZoomScale, max(minZoomScale, max(hScale, vScale)))
-        scrollView.setZoomScale(scale, animated: false)
-        scrollView.layoutIfNeeded()
-        let newContentSize = scrollView.contentSize
-        let x = (newContentSize.width - visibleRectSize.width) / 2
-        let y = (newContentSize.height - visibleRectSize.height) / 2
-        scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+    func showFullImage() {
+        guard let fullImageURL = fullImageURL else { return }
+        UIBlockingProgressHUD.show()
+        imageView.kf.setImage(
+            with: fullImageURL) { [weak self] result in
+                UIBlockingProgressHUD.dismiss()
+                guard let self = self else { return }
+                switch result {
+                case .success(_):
+                    DispatchQueue.main.async {
+                        self.centerImage()
+                    }
+                case .failure(_):
+                    self.showFullPhotoAlert()
+                }
+            }
     }
     
+    // Centering the image in ScrollView via frameToCenter according to scrollView bounds
+    func centerImage() {
+        let boundsSize = scrollView.bounds.size
+        var frameToCenter = imageView.frame
+        
+        if frameToCenter.size.width < boundsSize.width {
+            frameToCenter.origin.x = (boundsSize.width - frameToCenter.size.width) / 2
+        } else {
+            frameToCenter.origin.x = 0
+        }
+        
+        if frameToCenter.size.height < boundsSize.height {
+            frameToCenter.origin.y = (boundsSize.height - frameToCenter.size.height) / 2
+        } else {
+            frameToCenter.origin.y = 0
+        }
+        
+        imageView.frame = frameToCenter
+    }
     
-    // MARK: UI-configuration
+    // MARK: Style
         
     private func setupScrollView() {
         view.addSubview(scrollView)
-        
         scrollView.frame = view.bounds
-        
-        scrollView.minimumZoomScale = 0.1
-        scrollView.maximumZoomScale = 1.25
     }
     
     private func setupImageView() {
         view.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        imageView.backgroundColor = .ypBlack
-        imageView.contentMode = .scaleAspectFill
-        imageView.image = image
-        
+
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: view.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             imageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        
+
     }
     
     private func setupDismissButton() {
@@ -135,9 +163,33 @@ final class SingleImageViewController: UIViewController {
     
 }
 
+// MARK: Extension ScrollViewDelegate
+
 extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         imageView
     }
+}
+
+// MARK: Extension AlertDelegate
+
+extension SingleImageViewController: AlertPresenterDelegate {
+    func showAlert(alert: UIAlertController?) {
+        guard let alert = alert else { return }
+        self.present(alert, animated: true)
+    }
     
+    func showFullPhotoAlert() {
+        let alert = AlertModel(
+            title: "Ошибка загрузки",
+            message: "Что-то пошло не так. Попробовать ещё раз?",
+            buttonText: "Не нужно",
+            actionText: "Повторить", rightCompletion:  { [weak self] _ in
+                guard let self = self else { return }
+                self.showFullImage()
+            })
+        
+        alertPresenter = AlertPresenter(alertDelegate: self)
+        alertPresenter?.presentAlertController(alert: alert)
+    }
 }
