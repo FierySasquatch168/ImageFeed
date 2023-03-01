@@ -31,6 +31,13 @@ final class ImagesListCell: UITableViewCell {
         return imageView
     }()
     
+    private lazy var mainGradientView: GradientView = {
+        let view = GradientView(frame: mainImage.bounds)
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 16
+        return view
+    }()
+    
     // MARK: Lifecycle
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -38,7 +45,7 @@ final class ImagesListCell: UITableViewCell {
         
         self.backgroundColor = .clear
         configureMainImage()
-        configureGradientImageView()
+        configureDateGradientImageView()
         configureDateLabel()
         configureLikeButton()
         
@@ -49,6 +56,11 @@ final class ImagesListCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        configureMainGradientView()
+    }
+    
     // Guarantee that cells will use correct images
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -56,6 +68,7 @@ final class ImagesListCell: UITableViewCell {
         dateLabel.text = nil
         likeButton.imageView?.image = nil
         dateGradientView.image = nil
+        mainGradientView.removeFromSuperview()
     }
     
     // MARK: Behaviour
@@ -109,7 +122,7 @@ final class ImagesListCell: UITableViewCell {
         ])
     }
     
-    private func configureGradientImageView() {
+    private func configureDateGradientImageView() {
         addSubview(dateGradientView)
         dateGradientView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -119,5 +132,11 @@ final class ImagesListCell: UITableViewCell {
             dateGradientView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             dateGradientView.heightAnchor.constraint(equalToConstant: 30)
         ])
+    }
+    
+    private func configureMainGradientView() {
+        mainImage.addSubview(mainGradientView)
+        print("mainImage frame is: \(mainImage.frame)")
+        print("mainGradientView frame is: \(mainGradientView.frame)")
     }
 }

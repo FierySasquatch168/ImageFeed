@@ -67,13 +67,12 @@ final class ImagesListViewController: UIViewController {
     
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         guard let url = URL(string: photos[indexPath.row].thumbImageURL),
-              let date = photos[indexPath.row].createdAt,
-              let stubImage = UIImage(named: "Stub")
+              let date = photos[indexPath.row].createdAt
         else {
             return
         }
             cell.mainImage.kf.setImage(
-                with: url, placeholder: stubImage) { [weak self] result in
+                with: url) { [weak self] result in
                     guard let self = self else { return }
                     switch result {
                     case .success(_):
