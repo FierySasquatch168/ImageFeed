@@ -12,6 +12,7 @@ final class ProfileViewController: UIViewController {
     
     private var alertModel: AlertModel?
     private var alertPresenter: AlertPresenterProtocol?
+    private var animationViews: [GradientView] = []
     
     private var avatarCornerRadius: CGFloat = 35
     
@@ -22,6 +23,7 @@ final class ProfileViewController: UIViewController {
         imageView.image = UIImage(named: "person.crop.circle.fill")
         imageView.backgroundColor = .clear
         imageView.clipsToBounds = true
+        imageView.layer.masksToBounds = true
         
         NSLayoutConstraint.activate([
             imageView.heightAnchor.constraint(equalToConstant: 70),
@@ -37,6 +39,8 @@ final class ProfileViewController: UIViewController {
     private lazy var userNameLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 23, weight: .bold)
+        label.layer.masksToBounds = true
+        label.clipsToBounds = true
         label.textColor = .ypWhite
         label.text = "Имя пользователя"
         
@@ -46,7 +50,9 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13, weight: .regular)
         label.textColor = .ypGrey
-        label.text = "@логин"
+        label.clipsToBounds = true
+        label.layer.masksToBounds = true
+        label.text = "@логин_пользователя"
         
         return label
     }()
@@ -54,6 +60,8 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13, weight: .regular)
         label.textColor = .ypWhite
+        label.clipsToBounds = true
+        label.layer.masksToBounds = true
         label.text = "Hello, world!"
         
         return label
@@ -86,6 +94,7 @@ final class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupGradients()
         setNotificationObserver()
         updateProfileDetails(profile: profileService.profile)
         updateAvatar()
@@ -122,6 +131,7 @@ final class ProfileViewController: UIViewController {
         userNameLabel.text = profile.name
         userEmailLabel.text = profile.loginName
         userDescriptionLabel.text = profile.bio
+        removeGradients()
     }
     
     private func updateAvatar() {
@@ -132,6 +142,23 @@ final class ProfileViewController: UIViewController {
         }
         let processor = RoundCornerImageProcessor(cornerRadius: avatarCornerRadius)
         profileImage.kf.setImage(with: url, options: [.processor(processor)])
+    }
+    
+    func setupGradients() {
+        profileImage.addGradient(frame: CGRect(x: 0, y: 0, width: 70, height: 70), cornerRadius: 35)
+        userNameLabel.addGradient(frame: CGRect(x: 0, y: 0, width: 223, height: 30), cornerRadius: 15)
+        userEmailLabel.addGradient(frame: CGRect(x: 0, y: 0, width: 150, height: 20), cornerRadius: 10)
+        userDescriptionLabel.addGradient(frame: CGRect(x: 0, y: 0, width: 90, height: 20), cornerRadius: 10)
+    }
+    
+    private func removeGradients() {
+        profileImage.removeGradient()
+        userNameLabel.removeGradient()
+        userEmailLabel.removeGradient()
+        userDescriptionLabel.removeGradient()
+        
+        
+        
     }
     
     // MARK: UI setup

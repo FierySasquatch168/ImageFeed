@@ -68,7 +68,6 @@ final class ImagesListCell: UITableViewCell {
         dateLabel.text = nil
         likeButton.imageView?.image = nil
         dateGradientView.image = nil
-        mainGradientView.removeFromSuperview()
     }
     
     // MARK: Behaviour
@@ -136,7 +135,7 @@ final class ImagesListCell: UITableViewCell {
     
     private func configureMainGradientView() {
         mainImage.addSubview(mainGradientView)
-        print("mainImage frame is: \(mainImage.frame)")
-        print("mainGradientView frame is: \(mainGradientView.frame)")
+//        print("mainImage frame is: \(mainImage.frame)")
+//        print("mainGradientView frame is: \(mainGradientView.frame)")
     }
 }
