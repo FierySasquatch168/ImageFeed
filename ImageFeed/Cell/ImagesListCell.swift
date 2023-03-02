@@ -49,12 +49,6 @@ final class ImagesListCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        
-    }
-    
     // Guarantee that cells will use correct images
     override func prepareForReuse() {
         super.prepareForReuse()
