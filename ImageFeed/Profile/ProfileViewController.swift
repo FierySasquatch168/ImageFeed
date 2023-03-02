@@ -156,9 +156,6 @@ final class ProfileViewController: UIViewController {
         userNameLabel.removeGradient()
         userEmailLabel.removeGradient()
         userDescriptionLabel.removeGradient()
-        
-        
-        
     }
     
     // MARK: UI setup

@@ -31,13 +31,6 @@ final class ImagesListCell: UITableViewCell {
         return imageView
     }()
     
-    private lazy var mainGradientView: GradientView = {
-        let view = GradientView(frame: mainImage.bounds)
-        view.clipsToBounds = true
-        view.layer.cornerRadius = 16
-        return view
-    }()
-    
     // MARK: Lifecycle
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -58,7 +51,8 @@ final class ImagesListCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        configureMainGradientView()
+        
+        
     }
     
     // Guarantee that cells will use correct images
@@ -90,6 +84,7 @@ final class ImagesListCell: UITableViewCell {
         mainImage.layer.cornerRadius = 16
         mainImage.layer.masksToBounds = true
         mainImage.contentMode = .scaleAspectFill
+        
         
         NSLayoutConstraint.activate([
             mainImage.topAnchor.constraint(equalTo: topAnchor, constant: 4),
@@ -131,11 +126,5 @@ final class ImagesListCell: UITableViewCell {
             dateGradientView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             dateGradientView.heightAnchor.constraint(equalToConstant: 30)
         ])
-    }
-    
-    private func configureMainGradientView() {
-        mainImage.addSubview(mainGradientView)
-//        print("mainImage frame is: \(mainImage.frame)")
-//        print("mainGradientView frame is: \(mainGradientView.frame)")
     }
 }

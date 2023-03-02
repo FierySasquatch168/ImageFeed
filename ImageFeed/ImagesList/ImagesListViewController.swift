@@ -67,22 +67,29 @@ final class ImagesListViewController: UIViewController {
     
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         guard let url = URL(string: photos[indexPath.row].thumbImageURL),
-              let date = photos[indexPath.row].createdAt
+              let date = photos[indexPath.row].createdAt, let stubImage = UIImage(named: "Stub")
         else {
             return
         }
-            cell.mainImage.kf.setImage(
-                with: url) { [weak self] result in
-                    guard let self = self else { return }
-                    switch result {
-                    case .success(_):
-                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                    case .failure(let error):
-                        print(error)
-                    }
+        let height: CGFloat = photos[indexPath.row].size.height
+        let width: CGFloat = photos[indexPath.row].size.width
+        let frame = CGRect(x: 0, y: 0, width: width, height: height)
+        cell.mainImage.addGradient(frame: frame, cornerRadius: cell.mainImage.layer.cornerRadius)
+        cell.mainImage.kf.setImage(
+            with: url) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success(_):
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    cell.mainImage.removeGradient()
+                case .failure(let error):
+                    cell.mainImage.removeGradient()
+                    cell.mainImage.image = stubImage
+                    print(error)
                 }
-            cell.dateLabel.text = self.dateFormatter.string(from: date)
-            cell.setIsLiked(isLiked: self.photos[indexPath.row].isLiked)
+            }
+        cell.dateLabel.text = self.dateFormatter.string(from: date)
+        cell.setIsLiked(isLiked: self.photos[indexPath.row].isLiked)
     }
     
     private func updateTableViewAnimated() {
