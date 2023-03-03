@@ -38,7 +38,7 @@ final class ImagesListCell: UITableViewCell {
         
         self.backgroundColor = .clear
         configureMainImage()
-        configureGradientImageView()
+        configureDateGradientImageView()
         configureDateLabel()
         configureLikeButton()
         
@@ -79,6 +79,7 @@ final class ImagesListCell: UITableViewCell {
         mainImage.layer.masksToBounds = true
         mainImage.contentMode = .scaleAspectFill
         
+        
         NSLayoutConstraint.activate([
             mainImage.topAnchor.constraint(equalTo: topAnchor, constant: 4),
             mainImage.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -4),
@@ -109,7 +110,7 @@ final class ImagesListCell: UITableViewCell {
         ])
     }
     
-    private func configureGradientImageView() {
+    private func configureDateGradientImageView() {
         addSubview(dateGradientView)
         dateGradientView.translatesAutoresizingMaskIntoConstraints = false
         
