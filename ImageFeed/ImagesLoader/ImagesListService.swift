@@ -38,7 +38,7 @@ final class ImagesListService {
             + "?page=\(nextPage)"
             + "&&per_page=\(photosPerPage)",
             httpMethod: "GET",
-            baseURL: defaultBaseURL)
+            baseURL: DefaultBaseURL)
                 
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
@@ -72,7 +72,7 @@ final class ImagesListService {
             + "\(photoId)/"
             + "like",
             httpMethod: method,
-            baseURL: defaultBaseURL)
+            baseURL: DefaultBaseURL)
                 
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         

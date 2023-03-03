@@ -17,6 +17,10 @@ final class TabBarController: UITabBarController {
         navVC.navigationBar.isHidden = true
 
         let profileVC = ProfileViewController()
+        let profilePresenter = ProfilePresenter()
+        profileVC.presenter = profilePresenter
+        profilePresenter.view = profileVC
+        
         profileVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_profile_active"), tag: 1)
         
         UITabBar.appearance().tintColor = .ypWhite

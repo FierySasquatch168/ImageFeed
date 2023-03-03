@@ -63,7 +63,7 @@ final class ProfileImageService {
             path: "/users/"
             + "\(username)",
             httpMethod: "GET",
-            baseURL: defaultBaseURL)
+            baseURL: DefaultBaseURL)
         
         guard let token = oAuth2Service.authToken else { return nil }
         
