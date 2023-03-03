@@ -12,7 +12,6 @@ final class ProfileViewController: UIViewController {
     
     private var alertModel: AlertModel?
     private var alertPresenter: AlertPresenterProtocol?
-    private var animationViews: [GradientView] = []
     
     private var avatarCornerRadius: CGFloat = 35
     
