@@ -71,8 +71,8 @@ final class ImagesListViewController: UIViewController {
         else {
             return
         }
-        let height: CGFloat = photos[indexPath.row].size.height
-        let width: CGFloat = photos[indexPath.row].size.width
+        let height: CGFloat = cell.frame.height
+        let width: CGFloat = cell.frame.width
         let frame = CGRect(x: 0, y: 0, width: width, height: height)
         cell.mainImage.addGradient(frame: frame, cornerRadius: cell.mainImage.layer.cornerRadius)
         cell.mainImage.kf.setImage(
