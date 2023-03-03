@@ -81,7 +81,6 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
         return stackView
     }()
     
-    
     private var profileImageServiceObserver: NSObjectProtocol?
     
     override var preferredStatusBarStyle: UIStatusBarStyle {

@@ -18,15 +18,15 @@ protocol ProfilePresenterProtocol {
 
 final class ProfilePresenter: ProfilePresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
+    var logoutHelper: LogoutHelperProtocol?
 
     private var avatarCornerRadius: CGFloat = 35
     
     // MARK: Protocol methods
     
     func logout() {
-        clearToken()
-        clearUserDataFromMemory()
-        processToSplashScreen()
+        logoutHelper = LogoutHelper()
+        logoutHelper?.logout()
     }
     
     func updateProfile(with profile: Profile?) {
@@ -59,22 +59,5 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     private func setupUserDescription(from profile: Profile) {
         view?.updateUserdescription(with: profile.bio ?? "No description")
     }
-    
-    private func clearToken() {
-        // хранилище - удалить токен
-        OAuth2TokenStorage().token = nil
-    }
-    
-    private func clearUserDataFromMemory() {
-        // вебвью - удалить куки
-        WebViewViewController.clean()
-    }
-    
-    private func processToSplashScreen() {
-        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
-        window.rootViewController = SplashViewController()
-    }
-    
-    
 }
 
