@@ -48,8 +48,7 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         
     }
     
-    
-    // MARK: Behaviour
+    // MARK: Protocol methods
     
     func reloadTableView(at indexPath: IndexPath) {
         tableView.reloadRows(at: [indexPath], with: .automatic)

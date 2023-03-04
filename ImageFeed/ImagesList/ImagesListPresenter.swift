@@ -44,7 +44,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         return formatter
     }()
     
-    // MARK: Showing photos in tableView - refactor in fetcher
+    // MARK: Protocol methods
     func loadNextPage() {
         imagesListService.fetchPhotosNextPage()
     }
@@ -58,6 +58,16 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     func getFullImageURL(for indexPath: IndexPath) -> URL? {
         return URL(string: photos[indexPath.row].fullImageURL)
         
+    }
+    
+    func setNotificationObserver() {
+        imagesLoaderObserver = NotificationCenter.default.addObserver(
+            forName: ImagesListService.DidChangeNotification,
+            object: nil,
+            queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            self.checkForNeedOfAnimatedUpdate()
+        }
     }
     
     // MARK: Cell configurator
@@ -119,16 +129,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         }
     }
     
-    // MARK: Observer - refactor in observer
-    func setNotificationObserver() {
-        imagesLoaderObserver = NotificationCenter.default.addObserver(
-            forName: ImagesListService.DidChangeNotification,
-            object: nil,
-            queue: .main) { [weak self] _ in
-            guard let self = self else { return }
-            self.checkForNeedOfAnimatedUpdate()
-        }
-    }
+    // MARK: Class methods
     
     private func checkForNeedOfAnimatedUpdate() {
         let oldCount = photos.count
