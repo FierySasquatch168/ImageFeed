@@ -7,19 +7,20 @@
 
 import UIKit
 
-protocol ImagesListPresenterProtocol {
-//    var view: ImagesListViewControllerProtocol? { get set }
-    
+protocol ImagesListPresenterProtocol {    
     // showing photos in tableView
     var photos: [Photo] { get set }
     func loadNextPage()
     func updateNextPageIfNeeded(_ tableView: UITableView, forRowAt indexPath: IndexPath)
-    func checkForNeedOfAnimatedUpdate()
+    func getFullImageURL(for indexPath: IndexPath) -> URL?
     
     // configuring cells of tableView
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath)
     func getCellHeight(_ tableView: UITableView, at indexPath: IndexPath) -> CGFloat
-    func changeLike(_ cell: ImagesListCell, at indexPath: IndexPath)
+    func didTapLikeButton(_ cell: ImagesListCell, at indexPath: IndexPath)
+    
+    // observer
+    func setNotificationObserver()
     
     // dateFormatting
     
@@ -28,7 +29,7 @@ protocol ImagesListPresenterProtocol {
 final class ImagesListPresenter: ImagesListPresenterProtocol {
     
     var photos: [Photo] = []
-    
+    private var imagesLoaderObserver: NSObjectProtocol?
     private var imagesListService = ImagesListService.shared
     var view: ImagesListViewControllerProtocol
     
@@ -43,10 +44,23 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         return formatter
     }()
     
+    // MARK: Showing photos in tableView - refactor in fetcher
     func loadNextPage() {
         imagesListService.fetchPhotosNextPage()
     }
     
+    func updateNextPageIfNeeded(_ tableView: UITableView, forRowAt indexPath: IndexPath) {
+        if indexPath.row == imagesListService.photos.count-1 {
+            loadNextPage()
+        }
+    }
+    
+    func getFullImageURL(for indexPath: IndexPath) -> URL? {
+        return URL(string: photos[indexPath.row].fullImageURL)
+        
+    }
+    
+    // MARK: Cell configurator
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         guard let url = URL(string: photos[indexPath.row].thumbImageURL),
               let date = photos[indexPath.row].createdAt,
@@ -85,13 +99,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         return cellHeight
     }
     
-    func updateNextPageIfNeeded(_ tableView: UITableView, forRowAt indexPath: IndexPath) {
-        if indexPath.row == imagesListService.photos.count-1 {
-            loadNextPage()
-        }
-    }
-    
-    func changeLike(_ cell: ImagesListCell, at indexPath: IndexPath) {
+    func didTapLikeButton(_ cell: ImagesListCell, at indexPath: IndexPath) {
         let photo = photos[indexPath.row]
         imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { [weak self] result in
             guard let self = self else { return }
@@ -111,16 +119,36 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         }
     }
     
-    func checkForNeedOfAnimatedUpdate() {
-        let oldCount = photos.count
-        let newCount = imagesListService.photos.count
-        self.photos = imagesListService.photos
-        print("ImagesListPresenter checkForNeedOfAnimatedUpdate oldCount is \(oldCount), newCount is \(newCount)")
-        
-        if oldCount != newCount {
-            print("ImagesListPresenter view is: \(view)")
-            view.didReceivePhotosForTableViewAnimatedUpdate(from: oldCount, to: newCount)
-            print("checkForNeedOfAnimatedUpdate finished work")
+    // MARK: Observer - refactor in observer
+    func setNotificationObserver() {
+        imagesLoaderObserver = NotificationCenter.default.addObserver(
+            forName: ImagesListService.DidChangeNotification,
+            object: nil,
+            queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            self.checkForNeedOfAnimatedUpdate()
         }
     }
+    
+    private func checkForNeedOfAnimatedUpdate() {
+        let oldCount = photos.count
+        let newCount = imagesListService.photos.count
+        
+        if oldCount != newCount {
+            updatePhotosArray()
+            let indexPaths = createIndexPaths(from: oldCount, to: newCount)
+            view.didReceivePhotosForTableViewAnimatedUpdate(at: indexPaths)
+        }
+    }
+    
+    private func updatePhotosArray() {
+        self.photos = imagesListService.photos
+    }
+    
+    private func createIndexPaths(from oldCount: Int, to newCount: Int) -> [IndexPath] {
+        return (oldCount..<newCount).compactMap { i in
+            IndexPath(row: i, section: 0)
+        }
+    }
+    
 }

@@ -8,15 +8,14 @@
 import UIKit
 
 protocol ImagesListViewControllerProtocol: AnyObject {
-    var presenter: ImagesListPresenterProtocol? { get set }
     func reloadTableView(at indexPath: IndexPath)
-    func didReceivePhotosForTableViewAnimatedUpdate(from oldCount: Int, to newCount: Int)
+    func didReceivePhotosForTableViewAnimatedUpdate(at indexPaths: [IndexPath])
     func likeChangeFailed()
 }
 
 final class ImagesListViewController: UIViewController & ImagesListViewControllerProtocol {
     var presenter: ImagesListPresenterProtocol?
-    private var imagesLoaderObserver: NSObjectProtocol?
+    
     private var alertPresenter: AlertPresenterProtocol?
 
     private lazy var tableView: UITableView = {
@@ -42,24 +41,13 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         
         view.backgroundColor = .ypBlack
         setupTableView()
-        setNotificationObserver()
         
         presenter = ImagesListPresenter(view: self)
+        presenter?.setNotificationObserver()
         presenter?.loadNextPage()
         
     }
     
-    // MARK: Observer
-    private func setNotificationObserver() {
-        imagesLoaderObserver = NotificationCenter.default.addObserver(
-            forName: ImagesListService.DidChangeNotification,
-            object: nil,
-            queue: .main) { [weak self] _ in
-            guard let self = self else { return }
-            self.updateTableViewAnimated()
-        }
-    }
-   
     
     // MARK: Behaviour
     
@@ -71,15 +59,8 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         self.showLikeErrorAlert()
     }
     
-    private func updateTableViewAnimated() {
-        presenter?.checkForNeedOfAnimatedUpdate()
-    }
-    
-    func didReceivePhotosForTableViewAnimatedUpdate(from oldCount: Int, to newCount: Int) {
+    func didReceivePhotosForTableViewAnimatedUpdate(at indexPaths: [IndexPath]) {
         tableView.performBatchUpdates {
-            let indexPaths = (oldCount..<newCount).compactMap { i in
-                IndexPath(row: i, section: 0)
-            }
             tableView.insertRows(at: indexPaths, with: .automatic)
         }
     }
@@ -117,9 +98,7 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let singleImageVC = SingleImageViewController()
-        guard let photos = presenter?.photos,
-              let fullImageURL = URL(string: photos[indexPath.row].fullImageURL) else { return }
-        singleImageVC.fullImageURL = fullImageURL
+        singleImageVC.fullImageURL = presenter?.getFullImageURL(for: indexPath)
         singleImageVC.modalPresentationStyle = .fullScreen
         self.present(singleImageVC, animated: true)
     }
@@ -141,7 +120,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         
         UIBlockingProgressHUD.show()
-        presenter?.changeLike(cell, at: indexPath)
+        presenter?.didTapLikeButton(cell, at: indexPath)
         UIBlockingProgressHUD.dismiss()
             
     }
