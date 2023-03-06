@@ -84,7 +84,6 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         cell.dateLabel.text = cellConfigurator.setupDataLabelText(for: indexPath, at: self.photos)
         let isLiked = cellConfigurator.isLiked(for: indexPath, at: self.photos)
         cell.setIsLiked(isLiked: isLiked)
-        cell.selectionStyle = cellConfigurator.chooseCellSelectionStyle(for: cell)
     }
     
     func getCellHeight(_ tableView: UITableView, at indexPath: IndexPath) -> CGFloat {
