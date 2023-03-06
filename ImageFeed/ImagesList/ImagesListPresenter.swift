@@ -11,6 +11,7 @@ protocol ImagesListPresenterProtocol {
     // showing photos in tableView
     var photos: [Photo] { get set }
     func loadNextPage()
+    func setNotificationObserver()
     func updateNextPageIfNeeded(_ tableView: UITableView, forRowAt indexPath: IndexPath)
     func getFullImageURL(for indexPath: IndexPath) -> URL?
     
@@ -18,11 +19,6 @@ protocol ImagesListPresenterProtocol {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath)
     func getCellHeight(_ tableView: UITableView, at indexPath: IndexPath) -> CGFloat
     func didTapLikeButton(_ cell: ImagesListCell, at indexPath: IndexPath)
-    
-    // observer
-    func setNotificationObserver()
-    
-    // dateFormatting
     
 }
 
@@ -32,17 +28,12 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     private var imagesLoaderObserver: NSObjectProtocol?
     private var imagesListService = ImagesListService.shared
     var view: ImagesListViewControllerProtocol
+    var cellConfigurator: CellConfiguratorProtocol
     
-    init(view: ImagesListViewControllerProtocol) {
+    init(view: ImagesListViewControllerProtocol, cellConfigurator: CellConfiguratorProtocol) {
         self.view = view
+        self.cellConfigurator = cellConfigurator
     }
-    
-    private lazy var dateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    }()
     
     // MARK: Protocol methods
     func loadNextPage() {
@@ -72,8 +63,8 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     
     // MARK: Cell configurator
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        // TODO: move setIMage to CellConfigurator
         guard let url = URL(string: photos[indexPath.row].thumbImageURL),
-              let date = photos[indexPath.row].createdAt,
               let stubImage = UIImage(named: "Stub")
         else {
             return
@@ -89,25 +80,18 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
                 print(error)
             }
         }
-        cell.dateLabel.text = self.dateFormatter.string(from: date)
-        cell.setIsLiked(isLiked: self.photos[indexPath.row].isLiked)
-        cell.selectionStyle = .none
+        
+        cell.dateLabel.text = cellConfigurator.setupDataLabelText(for: indexPath, at: self.photos)
+        let isLiked = cellConfigurator.isLiked(for: indexPath, at: self.photos)
+        cell.setIsLiked(isLiked: isLiked)
+        cell.selectionStyle = cellConfigurator.chooseCellSelectionStyle(for: cell)
     }
     
     func getCellHeight(_ tableView: UITableView, at indexPath: IndexPath) -> CGFloat {
-        if photos.count == 0 {
-            return 0
-        }
-        
-        let imageWidth = photos[indexPath.row].size.width
-        let imageHeight = photos[indexPath.row].size.height
-        
-        let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
-        let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-        let scale = imageViewWidth / imageWidth
-        let cellHeight = imageHeight * scale + imageInsets.top + imageInsets.bottom
-        return cellHeight
+        return cellConfigurator.calculateCellHeight(tableView, at: indexPath, with: self.photos)
     }
+    
+    
     
     func didTapLikeButton(_ cell: ImagesListCell, at indexPath: IndexPath) {
         let photo = photos[indexPath.row]

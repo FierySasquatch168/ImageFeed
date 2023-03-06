@@ -8,6 +8,7 @@
 import UIKit
 
 protocol ImagesListViewControllerProtocol: AnyObject {
+    var presenter: ImagesListPresenterProtocol? { get set }
     func reloadTableView(at indexPath: IndexPath)
     func didReceivePhotosForTableViewAnimatedUpdate(at indexPaths: [IndexPath])
     func likeChangeFailed()
@@ -42,7 +43,7 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         view.backgroundColor = .ypBlack
         setupTableView()
         
-        presenter = ImagesListPresenter(view: self)
+        presenter = ImagesListPresenter(view: self, cellConfigurator: CellConfigurator())
         presenter?.setNotificationObserver()
         presenter?.loadNextPage()
         
