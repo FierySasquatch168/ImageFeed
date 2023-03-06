@@ -8,7 +8,6 @@
 import UIKit
 
 protocol CellConfiguratorProtocol {
-    var imageView: UIImageView { get set }
     func setupDataLabelText(for indexPath: IndexPath, at photos: [Photo]) -> String
     func isLiked(for indexPath: IndexPath, at photos: [Photo]) -> Bool
     func chooseCellSelectionStyle(for cell: ImagesListCell) -> UITableViewCell.SelectionStyle
@@ -17,8 +16,6 @@ protocol CellConfiguratorProtocol {
 
 
 final class CellConfigurator: CellConfiguratorProtocol {
-    var imageView = UIImageView()
-    
     private lazy var dateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
