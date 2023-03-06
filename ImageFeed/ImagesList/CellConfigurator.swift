@@ -10,7 +10,6 @@ import UIKit
 protocol CellConfiguratorProtocol {
     func setupDataLabelText(for indexPath: IndexPath, at photos: [Photo]) -> String
     func isLiked(for indexPath: IndexPath, at photos: [Photo]) -> Bool
-    func chooseCellSelectionStyle(for cell: ImagesListCell) -> UITableViewCell.SelectionStyle
     func calculateCellHeight(_ tableView: UITableView, at indexPath: IndexPath, with photos: [Photo]) -> CGFloat
 }
 
@@ -30,10 +29,6 @@ final class CellConfigurator: CellConfiguratorProtocol {
     
     func isLiked(for indexPath: IndexPath, at photos: [Photo]) -> Bool {
         return photos[indexPath.row].isLiked
-    }
-    
-    func chooseCellSelectionStyle(for cell: ImagesListCell) -> UITableViewCell.SelectionStyle {
-        return .none
     }
     
     func calculateCellHeight(_ tableView: UITableView, at indexPath: IndexPath, with photos: [Photo]) -> CGFloat {
