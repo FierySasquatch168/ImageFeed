@@ -84,7 +84,7 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
 
 extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return presenter?.photos.count ?? 0
+        return presenter?.countPhotos() ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -92,7 +92,7 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         cell.delegate = self
-        presenter?.configCell(for: cell, with: indexPath)
+        presenter?.configCell(for: cell, at: indexPath)
         return cell
     }
     
