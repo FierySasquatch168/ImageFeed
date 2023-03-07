@@ -22,9 +22,11 @@ protocol ImagesListPresenterProtocol {
     
 }
 
+protocol CellConfiguratorDelegate: AnyObject {
+    func didConfigureCellImage(at indexPath: IndexPath)
+}
+
 final class ImagesListPresenter: ImagesListPresenterProtocol {
-    
-    
     private var imagesLoaderObserver: NSObjectProtocol?
     private var imagesListService = ImagesListService.shared
     var view: ImagesListViewControllerProtocol
@@ -67,27 +69,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     
     // MARK: Cell configurator
     func configCell(for cell: ImagesListCell, at indexPath: IndexPath) {
-        // TODO: move setIMage to CellConfigurator
-        guard let url = URL(string: cellConfigurator.photos[indexPath.row].thumbImageURL),
-              let stubImage = UIImage(named: "Stub")
-        else {
-            return
-        }
-        
-        cell.mainImage.kf.setImage(with: url,
-                                   placeholder: stubImage) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(_):
-                self.view.reloadTableView(at: indexPath)
-            case .failure(let error):
-                print(error)
-            }
-        }
-        
-        cell.dateLabel.text = cellConfigurator.setupDataLabelText(for: indexPath)
-        let isLiked = cellConfigurator.isLiked(for: indexPath)
-        cell.setIsLiked(isLiked: isLiked)
+        cellConfigurator.configureCell(for: cell, at: indexPath)
     }
     
     func getCellHeight(_ tableView: UITableView, at indexPath: IndexPath) -> CGFloat {
@@ -140,4 +122,10 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         }
     }
     
+}
+
+extension ImagesListPresenter: CellConfiguratorDelegate {
+    func didConfigureCellImage(at indexPath: IndexPath) {
+        self.view.reloadTableView(at: indexPath)
+    }
 }
