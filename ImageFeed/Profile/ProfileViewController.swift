@@ -164,6 +164,8 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     }
 }
 
+// MARK: Extension AlertPresenterDelegate
+
 extension ProfileViewController: AlertPresenterDelegate {
     func showAlert(alert: UIAlertController?) {
         guard let alert = alert else { return }
