@@ -90,10 +90,9 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         return cellConfigurator.calculateCellHeight(tableView, at: indexPath, with: self.photos)
     }
     
-    
-    
     func didTapLikeButton(_ cell: ImagesListCell, at indexPath: IndexPath) {
         let photo = photos[indexPath.row]
+        UIBlockingProgressHUD.show()
         imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -104,9 +103,11 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
                     self.photos = self.imagesListService.photos
                     // Change the like image
                     cell.setIsLiked(isLiked: self.photos[indexPath.row].isLiked)
+                    UIBlockingProgressHUD.dismiss()
                 }
                 
             case .failure(_):
+                UIBlockingProgressHUD.dismiss()
                 self.view.likeChangeFailed()
             }
         }
