@@ -9,14 +9,17 @@ import UIKit
 
 protocol CellConfiguratorProtocol {
     var photos: [Photo] { get set }
+    var presenterDelegate: CellConfiguratorDelegate? { get set }
     func configureCell(for cell: ImagesListCell, at indexPath: IndexPath)
     func calculateCellHeight(_ tableView: UITableView, at indexPath: IndexPath) -> CGFloat
+    func didTapLikeButton(_ cell: ImagesListCell, at indexPath: IndexPath)
 }
 
 
 final class CellConfigurator: CellConfiguratorProtocol {
     var photos: [Photo] = []
     weak var presenterDelegate: CellConfiguratorDelegate?
+    private var imagesListService = ImagesListService.shared
     
     private lazy var dateFormatter = {
         let formatter = DateFormatter()
@@ -29,6 +32,41 @@ final class CellConfigurator: CellConfiguratorProtocol {
         setupCellMainImage(for: cell, at: indexPath)
         setupDataLabelText(cell: cell, at: indexPath)
         isLiked(cell: cell, at: indexPath)
+    }
+    
+    func calculateCellHeight(_ tableView: UITableView, at indexPath: IndexPath) -> CGFloat {
+        if photos.count == 0 { return 0 }
+        let imageWidth = photos[indexPath.row].size.width
+        let imageHeight = photos[indexPath.row].size.height
+        
+        let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
+        let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
+        let scale = imageViewWidth / imageWidth
+        let cellHeight = imageHeight * scale + imageInsets.top + imageInsets.bottom
+        return cellHeight
+    }
+    
+    func didTapLikeButton(_ cell: ImagesListCell, at indexPath: IndexPath) {
+        let photo = photos[indexPath.row]
+        UIBlockingProgressHUD.show()
+        imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success():
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    // Synchronize the arrays of photos
+                    self.photos = self.imagesListService.photos
+                    // Change the like image
+                    cell.setIsLiked(isLiked: self.photos[indexPath.row].isLiked)
+                    UIBlockingProgressHUD.dismiss()
+                }
+                
+            case .failure(_):
+                UIBlockingProgressHUD.dismiss()
+                self.presenterDelegate?.didGetErrorWhenChangingLike()
+            }
+        }
     }
     
     private func setupCellMainImage(for cell: ImagesListCell, at indexPath: IndexPath) {
@@ -61,15 +99,5 @@ final class CellConfigurator: CellConfiguratorProtocol {
         cell.setIsLiked(isLiked: isLiked)        
     }
     
-    func calculateCellHeight(_ tableView: UITableView, at indexPath: IndexPath) -> CGFloat {
-        if photos.count == 0 { return 0 }
-        let imageWidth = photos[indexPath.row].size.width
-        let imageHeight = photos[indexPath.row].size.height
-        
-        let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
-        let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-        let scale = imageViewWidth / imageWidth
-        let cellHeight = imageHeight * scale + imageInsets.top + imageInsets.bottom
-        return cellHeight
-    }
+    
 }

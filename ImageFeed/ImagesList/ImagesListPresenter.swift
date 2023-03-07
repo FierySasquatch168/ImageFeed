@@ -24,6 +24,7 @@ protocol ImagesListPresenterProtocol {
 
 protocol CellConfiguratorDelegate: AnyObject {
     func didConfigureCellImage(at indexPath: IndexPath)
+    func didGetErrorWhenChangingLike()
 }
 
 final class ImagesListPresenter: ImagesListPresenterProtocol {
@@ -69,6 +70,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     
     // MARK: Cell configurator
     func configCell(for cell: ImagesListCell, at indexPath: IndexPath) {
+        cellConfigurator.presenterDelegate = self
         cellConfigurator.configureCell(for: cell, at: indexPath)
     }
     
@@ -77,26 +79,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     }
     
     func didTapLikeButton(_ cell: ImagesListCell, at indexPath: IndexPath) {
-        let photo = cellConfigurator.photos[indexPath.row]
-        UIBlockingProgressHUD.show()
-        imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success():
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    // Synchronize the arrays of photos
-                    self.cellConfigurator.photos = self.imagesListService.photos
-                    // Change the like image
-                    cell.setIsLiked(isLiked: self.cellConfigurator.photos[indexPath.row].isLiked)
-                    UIBlockingProgressHUD.dismiss()
-                }
-                
-            case .failure(_):
-                UIBlockingProgressHUD.dismiss()
-                self.view.likeChangeFailed()
-            }
-        }
+        cellConfigurator.didTapLikeButton(cell, at: indexPath)
     }
     
     // MARK: Class methods
@@ -124,8 +107,14 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     
 }
 
+// MARK: Extension CellConfiguratorDelegate
+
 extension ImagesListPresenter: CellConfiguratorDelegate {
     func didConfigureCellImage(at indexPath: IndexPath) {
         self.view.reloadTableView(at: indexPath)
+    }
+    
+    func didGetErrorWhenChangingLike() {
+         self.view.likeChangeFailed()
     }
 }
