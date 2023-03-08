@@ -9,9 +9,8 @@ import Foundation
 
 protocol ImagesListPresenterProtocol {
     var imagesHelper: ImagesHelperProtocol { get set }
-    func loadNextPage()
-    func setNotificationObserver()
-    func updateNextPageIfNeeded(forRowAt indexPath: IndexPath)
+    func viewDidLoad()
+    // info for cell configuration
     func getFullImageURL(for indexPath: IndexPath) -> URL?
     func getThumbImageURL(for indexPath: IndexPath) -> URL?
     func countPhotos() -> Int
@@ -22,13 +21,20 @@ protocol ImagesListPresenterProtocol {
     func getCellHeight(at indexPath: IndexPath, width: CGFloat, left: CGFloat, right: CGFloat, top: CGFloat, bottom: CGFloat) -> CGFloat
     func getDateLabelText(at indexPath: IndexPath) -> String
     func isLiked(at indexPath: IndexPath) -> Bool
+    func updateNextPageIfNeeded(forRowAt indexPath: IndexPath)
 }
 
 final class ImagesListPresenter: ImagesListPresenterProtocol {
+    var photos: [Photo] = []
     
-    private var imagesListService = ImagesListService.shared
+    private lazy var dateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter
+    }()
+    
     private var imagesLoaderObserver: NSObjectProtocol?
-    
     var view: ImagesListViewControllerProtocol
     var imagesHelper: ImagesHelperProtocol
     
@@ -37,10 +43,9 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         self.imagesHelper = imagesHelper
     }
     
-    // MARK: Notification and pages loading
-    
-    func loadNextPage() {
-        imagesListService.fetchPhotosNextPage()
+    func viewDidLoad() {
+        setNotificationObserver()
+        imagesHelper.loadNextPage()
     }
     
     func setNotificationObserver() {
@@ -53,75 +58,76 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
             }
     }
     
-    func updateNextPageIfNeeded(forRowAt indexPath: IndexPath) {
-        if indexPath.row == imagesListService.photos.count-1 {
-            loadNextPage()
-        }
-    }
-    
     // MARK: Work with photo
     
     func getFullImageURL(for indexPath: IndexPath) -> URL? {
-        imagesHelper.getFullImageURL(for: indexPath)
-        
+        return URL(string: photos[indexPath.row].fullImageURL)
     }
     
     func getThumbImageURL(for indexPath: IndexPath) -> URL? {
-        imagesHelper.getThumbImageURL(for: indexPath)
+        return URL(string: photos[indexPath.row].thumbImageURL)
     }
     
     func countPhotos() -> Int {
-        imagesHelper.countPhotos()
+        return photos.count
     }
     
     func getImageHeight(at indexPath: IndexPath) -> CGFloat {
-        imagesHelper.getImageHeight(at: indexPath)
+        return photos[indexPath.row].size.height
     }
     
     func getImageWidth(at indexPath: IndexPath) -> CGFloat {
-        imagesHelper.getImageWidth(at: indexPath)
+        return photos[indexPath.row].size.width
     }
     
     func getCellHeight(at indexPath: IndexPath, width: CGFloat, left: CGFloat, right: CGFloat, top: CGFloat, bottom: CGFloat) -> CGFloat {
-        imagesHelper.getCellHeight(at: indexPath, width: width, left: left, right: right, top: top, bottom: bottom)
+        let imageWidth = getImageWidth(at: indexPath)
+        let imageHeight = getImageHeight(at: indexPath)
+        
+        let imageViewWidth = width - left - right
+        let scale = imageViewWidth / imageWidth
+        let cellHeight = imageHeight * scale + top + bottom
+        return cellHeight
     }
     
     func getPhoto(at indexPath: IndexPath) -> Photo {
-        imagesHelper.getPhoto(at: indexPath)
+        return photos[indexPath.row]
     }
     
     func updatePhotosArray() {
-        imagesHelper.updatePhotosArray()
+        self.photos = imagesHelper.returnModelPhotos()
     }
     
     func getDateLabelText(at indexPath: IndexPath) -> String {
-        imagesHelper.getDateLabelText(at: indexPath)
+        guard let date = photos[indexPath.row].createdAt else { return "Date error in getDateLabelText" }
+        return dateFormatter.string(from: date)
     }
     
     func isLiked(at indexPath: IndexPath) -> Bool {
-        imagesHelper.isLiked(at: indexPath)
+        return photos[indexPath.row].isLiked
+    }
+    
+    func updateNextPageIfNeeded(forRowAt indexPath: IndexPath) {
+        if indexPath.row == imagesHelper.countModelPhotos() - 1 {
+            imagesHelper.loadNextPage()
+        }
     }
     
     // MARK: Class methods
-    
-    private func countModelPhotos() -> Int {
-        return imagesListService.photos.count
+    private func checkForNeedOfAnimatedUpdate() {
+        let oldCount = countPhotos()
+        let newCount = imagesHelper.countModelPhotos()
+        
+        if oldCount != newCount {
+            updatePhotosArray()
+            let indexPaths = createIndexPaths(from: oldCount, to: newCount)
+            view.didReceivePhotosForTableViewAnimatedUpdate(at: indexPaths)
+        }
     }
     
-    private func checkForNeedOfAnimatedUpdate() {
-            let oldCount = countPhotos()
-            let newCount = countModelPhotos()
-            
-            if oldCount != newCount {
-                updatePhotosArray()
-                let indexPaths = createIndexPaths(from: oldCount, to: newCount)
-                view.didReceivePhotosForTableViewAnimatedUpdate(at: indexPaths)
-            }
+    private func createIndexPaths(from oldCount: Int, to newCount: Int) -> [IndexPath] {
+        return (oldCount..<newCount).compactMap { i in
+            IndexPath(row: i, section: 0)
         }
-        
-        private func createIndexPaths(from oldCount: Int, to newCount: Int) -> [IndexPath] {
-            return (oldCount..<newCount).compactMap { i in
-                IndexPath(row: i, section: 0)
-            }
-        }
+    }
 }

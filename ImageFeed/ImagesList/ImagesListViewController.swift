@@ -43,8 +43,7 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         view.backgroundColor = .ypBlack
         setupTableView()
         presenter = ImagesListPresenter(view: self, imagesHelper: ImagesHelper())
-        presenter?.setNotificationObserver()
-        presenter?.loadNextPage()
+        presenter?.viewDidLoad()
     }
     
     // MARK: Protocol methods
@@ -55,7 +54,6 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
     }
     
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        
         setupCellMainImage(for: cell, at: indexPath)
         setupDataLabelText(cell: cell, at: indexPath)
         setupLikeImage(cell: cell, at: indexPath)
@@ -69,19 +67,19 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         else {
             return
         }
-
-            cell.mainImage.kf.setImage(with: url,
-                                       placeholder: stubImage) { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success(_):
-                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                case .failure(let error):
-                    cell.mainImage.image = stubImage
-                    print(error)
-                }
+        
+        cell.mainImage.kf.setImage(with: url,
+                                   placeholder: stubImage) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(_):
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            case .failure(let error):
+                cell.mainImage.image = stubImage
+                print(error)
             }
         }
+    }
     
     private func setupDataLabelText(cell: ImagesListCell, at indexPath: IndexPath) {
         cell.dateLabel.text = presenter?.getDateLabelText(at: indexPath)
