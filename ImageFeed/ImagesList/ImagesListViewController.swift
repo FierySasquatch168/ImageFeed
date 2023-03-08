@@ -11,6 +11,7 @@ import UIKit
 protocol ImagesListViewControllerProtocol {
     var presenter: ImagesListPresenterProtocol? { get set }
     func didReceivePhotosForTableViewAnimatedUpdate(at indexPaths: [IndexPath])
+    func configCell(for cell: ImagesListCell, with indexPath: IndexPath)
 }
 
 final class ImagesListViewController: UIViewController & ImagesListViewControllerProtocol {
@@ -28,13 +29,6 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         tableView.backgroundColor = .ypBlack
         tableView.separatorStyle = .none
         return tableView
-    }()
-    
-    private lazy var dateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
     }()
     
     // MARK: Lifecycle
@@ -60,19 +54,24 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         }
     }
     
-    // MARK: Behaviour
+    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        
+        setupCellMainImage(for: cell, at: indexPath)
+        setupDataLabelText(cell: cell, at: indexPath)
+        setupLikeImage(cell: cell, at: indexPath)
+    }
     
-    private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard let stringUrl = presenter?.photos[indexPath.row].thumbImageURL,
-              let url = URL(string: (stringUrl)),
-              let date = presenter?.photos[indexPath.row].createdAt,
+    // MARK: Class methods
+    
+    private func setupCellMainImage(for cell: ImagesListCell, at indexPath: IndexPath) {
+        guard let url = presenter?.getThumbImageURL(for: indexPath),
               let stubImage = UIImage(named: "Stub")
         else {
             return
         }
-        
-        cell.mainImage.kf.setImage(
-            with: url) { [weak self] result in
+
+            cell.mainImage.kf.setImage(with: url,
+                                       placeholder: stubImage) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(_):
@@ -82,8 +81,15 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
                     print(error)
                 }
             }
-        cell.dateLabel.text = self.dateFormatter.string(from: date)
-        cell.setIsLiked(isLiked: (self.presenter?.photos[indexPath.row].isLiked)!)
+        }
+    
+    private func setupDataLabelText(cell: ImagesListCell, at indexPath: IndexPath) {
+        cell.dateLabel.text = presenter?.getDateLabelText(at: indexPath)
+    }
+    
+    private func setupLikeImage(cell: ImagesListCell, at indexPath: IndexPath) {
+        guard let isLiked = presenter?.isLiked(at: indexPath) else { return }
+        cell.setIsLiked(isLiked: isLiked)
     }
     
     // MARK: Style
@@ -112,7 +118,6 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
         }
         cell.delegate = self
         configCell(for: cell, with: indexPath)
-        cell.selectionStyle = .none
         return cell
     }
     
@@ -132,9 +137,7 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == ImagesListService.shared.photos.count-1 {
-            ImagesListService.shared.fetchPhotosNextPage()
-        }
+        presenter?.updateNextPageIfNeeded(forRowAt: indexPath)
     }
     
 }
@@ -156,14 +159,15 @@ extension ImagesListViewController: ImagesListCellDelegate {
                         // Synchronize the arrays of photos
                         self.presenter?.updatePhotosArray()
                         // Change the like image
-                        cell.setIsLiked(isLiked: (self.presenter?.photos[indexPath.row].isLiked)!)
+                        if let isLiked = self.presenter?.isLiked(at: indexPath) {
+                            cell.setIsLiked(isLiked: isLiked)
+                        }
                         // Dismiss the loader
                         UIBlockingProgressHUD.dismiss()
                     }
                     
                 case .failure(_):
                     UIBlockingProgressHUD.dismiss()
-                    // TODO: Show alert
                     self.showLikeErrorAlert()
             }
         }
