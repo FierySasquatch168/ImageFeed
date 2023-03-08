@@ -8,8 +8,10 @@
 @testable import ImageFeed
 import Foundation
 
-final class ProfileViewPresenterSpy: ProfilePresenterProtocol {    
+final class ProfileViewPresenterSpy: ProfilePresenterProtocol {
+    var profileImageServiceObserver: NSObjectProtocol?
     var view: ImageFeed.ProfileViewControllerProtocol?
+    
     var setNotificationObserverCalled: Bool = false
     var updateProfileCalled: Bool = false
     var updateAvatarCalled: Bool = false

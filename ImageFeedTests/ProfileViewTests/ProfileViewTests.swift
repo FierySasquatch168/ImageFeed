@@ -69,4 +69,15 @@ final class ProfileViewTests: XCTestCase {
         //then
         XCTAssertTrue(logoutHelper.logoutCalled)
     }
+    
+    func testPresenterNotificationCenterNotNil() {
+        // given
+        let presenter = ProfilePresenter(logoutHelper: LogoutHelperSpy())
+        
+        // when
+        presenter.setNotificationObserver()
+        
+        //then
+        XCTAssertNotNil(presenter.profileImageServiceObserver)
+    }
 }

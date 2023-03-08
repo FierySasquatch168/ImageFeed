@@ -10,6 +10,7 @@ import Foundation
 
 protocol ProfilePresenterProtocol {
     var view: ProfileViewControllerProtocol? { get set }
+    var profileImageServiceObserver: NSObjectProtocol? { get set }
     func setNotificationObserver()
     func updateProfile(with profile: Profile?)
     func updateAvatar(with stringUrl: String?)
@@ -18,7 +19,7 @@ protocol ProfilePresenterProtocol {
 
 final class ProfilePresenter: ProfilePresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
-    private var profileImageServiceObserver: NSObjectProtocol?
+    var profileImageServiceObserver: NSObjectProtocol?
     private var profileImageService = ProfileImageService.shared
     private var avatarCornerRadius: CGFloat = 35
     
