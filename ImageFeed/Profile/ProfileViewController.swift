@@ -6,10 +6,11 @@
 //
 
 import UIKit
+import Kingfisher
 
 protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfilePresenterProtocol? { get set }
-    var profileImage: UIImageView { get set }
+    func setImage(from url: URL?, with cornerRadius: CGFloat)
     func updateUserName(with name: String)
     func updateUserEmail(with email: String)
     func updateUserdescription(with description: String)
@@ -20,6 +21,8 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     
     private var alertModel: AlertModel?
     private var alertPresenter: AlertPresenterProtocol?
+    private var profileService = ProfileService.shared
+    private var profileImageService = ProfileImageService.shared
     
     lazy var profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -89,7 +92,9 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        presenter?.viewDidLoad()
+        presenter?.setNotificationObserver()
+        presenter?.updateProfile(with: profileService.profile)
+        presenter?.updateAvatar(with: profileImageService.avatarURL)
     }
     
     // MARK: Logout Behavior
@@ -98,6 +103,11 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     }
     
     // MARK: Protocol methods
+    
+    func setImage(from url: URL?, with cornerRadius: CGFloat) {
+        let processor = RoundCornerImageProcessor(cornerRadius: cornerRadius)
+        profileImage.kf.setImage(with: url, options: [.processor(processor)])
+    }
     
     func updateUserName(with name: String) {
         userNameLabel.text = name
