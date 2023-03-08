@@ -9,7 +9,7 @@
 import XCTest
 
 final class ProfileViewTests: XCTestCase {
-    
+    // TODO: check equality for profile data
     func testViewControllerCallsPresenter() {
         // given
         let viewController = ProfileViewController()

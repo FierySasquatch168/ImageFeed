@@ -11,7 +11,6 @@ import UIKit
 protocol ImagesListViewControllerProtocol {
     var presenter: ImagesListPresenterProtocol? { get set }
     func didReceivePhotosForTableViewAnimatedUpdate(at indexPaths: [IndexPath])
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath)
 }
 
 final class ImagesListViewController: UIViewController & ImagesListViewControllerProtocol {
@@ -42,7 +41,6 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         
         view.backgroundColor = .ypBlack
         setupTableView()
-        presenter = ImagesListPresenter(view: self, imagesHelper: ImagesHelper())
         presenter?.viewDidLoad()
     }
     
@@ -53,13 +51,13 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         }
     }
     
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+    // MARK: Class methods
+    
+    private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         setupCellMainImage(for: cell, at: indexPath)
         setupDataLabelText(cell: cell, at: indexPath)
         setupLikeImage(cell: cell, at: indexPath)
     }
-    
-    // MARK: Class methods
     
     private func setupCellMainImage(for cell: ImagesListCell, at indexPath: IndexPath) {
         guard let url = presenter?.getThumbImageURL(for: indexPath),

@@ -39,6 +39,11 @@
 		37ABA20729B8F98400696212 /* ProfileViewPresenterSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABA20629B8F98400696212 /* ProfileViewPresenterSpy.swift */; };
 		37ABA20929B8F99500696212 /* ProfileViewControllerSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABA20829B8F99500696212 /* ProfileViewControllerSpy.swift */; };
 		37ABA20B29B903E800696212 /* LogoutHelperSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABA20A29B903E800696212 /* LogoutHelperSpy.swift */; };
+		37ABA20E29B9081300696212 /* ImagesListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABA20D29B9081300696212 /* ImagesListTests.swift */; };
+		37ABA21029B9082F00696212 /* ImagesListViewControllerSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABA20F29B9082F00696212 /* ImagesListViewControllerSpy.swift */; };
+		37ABA21229B9083B00696212 /* ImagesListPresenterSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABA21129B9083B00696212 /* ImagesListPresenterSpy.swift */; };
+		37ABA21629B91EC400696212 /* CustomDateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABA21529B91EC400696212 /* CustomDateFormatter.swift */; };
+		37ABA21A29B92ABB00696212 /* MockPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ABA21929B92ABB00696212 /* MockPhotos.swift */; };
 		37B7263D29B353EC00ED1710 /* ImagesListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37B7263C29B353EC00ED1710 /* ImagesListPresenter.swift */; };
 		37C92E9F297C5BA8004EE4B4 /* URL+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C92E9E297C5BA8004EE4B4 /* URL+Extensions.swift */; };
 		37C92EA1297C5BCD004EE4B4 /* OAuth2TokenStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C92EA0297C5BCD004EE4B4 /* OAuth2TokenStorage.swift */; };
@@ -98,6 +103,11 @@
 		37ABA20629B8F98400696212 /* ProfileViewPresenterSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewPresenterSpy.swift; sourceTree = "<group>"; };
 		37ABA20829B8F99500696212 /* ProfileViewControllerSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewControllerSpy.swift; sourceTree = "<group>"; };
 		37ABA20A29B903E800696212 /* LogoutHelperSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutHelperSpy.swift; sourceTree = "<group>"; };
+		37ABA20D29B9081300696212 /* ImagesListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListTests.swift; sourceTree = "<group>"; };
+		37ABA20F29B9082F00696212 /* ImagesListViewControllerSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListViewControllerSpy.swift; sourceTree = "<group>"; };
+		37ABA21129B9083B00696212 /* ImagesListPresenterSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListPresenterSpy.swift; sourceTree = "<group>"; };
+		37ABA21529B91EC400696212 /* CustomDateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDateFormatter.swift; sourceTree = "<group>"; };
+		37ABA21929B92ABB00696212 /* MockPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPhotos.swift; sourceTree = "<group>"; };
 		37B7263C29B353EC00ED1710 /* ImagesListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListPresenter.swift; sourceTree = "<group>"; };
 		37C92E9E297C5BA8004EE4B4 /* URL+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Extensions.swift"; sourceTree = "<group>"; };
 		37C92EA0297C5BCD004EE4B4 /* OAuth2TokenStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuth2TokenStorage.swift; sourceTree = "<group>"; };
@@ -212,6 +222,7 @@
 			children = (
 				370F7530298C039D002B4D31 /* UIBlockingProgressHUD.swift */,
 				3763A48B297D8FBB00797E09 /* CustomNavigationController.swift */,
+				37ABA21529B91EC400696212 /* CustomDateFormatter.swift */,
 			);
 			path = CustomObjects;
 			sourceTree = "<group>";
@@ -230,6 +241,7 @@
 		3797BDD129B224AF00CC39F2 /* ImageFeedTests */ = {
 			isa = PBXGroup;
 			children = (
+				37ABA20C29B907FA00696212 /* ImagesListTests */,
 				37ABA20329B8F95800696212 /* ProfileViewTests */,
 				3797BDDD29B230B400CC39F2 /* WebViewTests */,
 			);
@@ -255,6 +267,17 @@
 				37ABA20A29B903E800696212 /* LogoutHelperSpy.swift */,
 			);
 			path = ProfileViewTests;
+			sourceTree = "<group>";
+		};
+		37ABA20C29B907FA00696212 /* ImagesListTests */ = {
+			isa = PBXGroup;
+			children = (
+				37ABA20D29B9081300696212 /* ImagesListTests.swift */,
+				37ABA20F29B9082F00696212 /* ImagesListViewControllerSpy.swift */,
+				37ABA21129B9083B00696212 /* ImagesListPresenterSpy.swift */,
+				37ABA21929B92ABB00696212 /* MockPhotos.swift */,
+			);
+			path = ImagesListTests;
 			sourceTree = "<group>";
 		};
 		37C92EA4297C6F62004EE4B4 /* SplashViewController */ = {
@@ -450,9 +473,13 @@
 				37ABA20729B8F98400696212 /* ProfileViewPresenterSpy.swift in Sources */,
 				37ABA20B29B903E800696212 /* LogoutHelperSpy.swift in Sources */,
 				3797BDD329B224AF00CC39F2 /* WebViewTests.swift in Sources */,
+				37ABA21029B9082F00696212 /* ImagesListViewControllerSpy.swift in Sources */,
 				3797BDDC29B2307D00CC39F2 /* WebViewControllerSpy.swift in Sources */,
+				37ABA20E29B9081300696212 /* ImagesListTests.swift in Sources */,
+				37ABA21229B9083B00696212 /* ImagesListPresenterSpy.swift in Sources */,
 				3797BDDA29B226AF00CC39F2 /* WebViewPresenterSpy.swift in Sources */,
 				37ABA20929B8F99500696212 /* ProfileViewControllerSpy.swift in Sources */,
+				37ABA21A29B92ABB00696212 /* MockPhotos.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -487,6 +514,7 @@
 				37C92EA1297C5BCD004EE4B4 /* OAuth2TokenStorage.swift in Sources */,
 				37FCDC512979BFA800526F77 /* AuthViewController.swift in Sources */,
 				370F753A298C64CB002B4D31 /* ProfileImageService.swift in Sources */,
+				37ABA21629B91EC400696212 /* CustomDateFormatter.swift in Sources */,
 				370F7534298C0977002B4D31 /* ProfileService.swift in Sources */,
 				37F40AD2299F7AB30025FB3D /* ImagesListService.swift in Sources */,
 				37FCDC4F2979B5D700526F77 /* AuthConfiguration.swift in Sources */,

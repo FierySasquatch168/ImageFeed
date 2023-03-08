@@ -11,8 +11,13 @@ final class TabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let navVC = CustomNavigationController(rootViewController: ImagesListViewController())
+        
+        let imagesListVC = ImagesListViewController()
+        let imagesListPresenter = ImagesListPresenter(imagesHelper: ImagesHelper())
+        imagesListVC.presenter = imagesListPresenter
+        imagesListPresenter.view = imagesListVC
+        
+        let navVC = CustomNavigationController(rootViewController: imagesListVC)
         navVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_editorial_active"), tag: 0)
         navVC.navigationBar.isHidden = true
 
