@@ -20,7 +20,6 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     
     private var alertModel: AlertModel?
     private var alertPresenter: AlertPresenterProtocol?
-    private var profileService = ProfileService.shared
     
     lazy var profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -81,8 +80,6 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
         return stackView
     }()
     
-    private var profileImageServiceObserver: NSObjectProtocol?
-    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
@@ -92,22 +89,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setNotificationObserver()
-        presenter?.updateProfile(with: profileService.profile)
-        presenter?.updateAvatar()
-    }
-    
-    // MARK: Observer
-    
-    func setNotificationObserver() {
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self = self else { return }
-            self.presenter?.updateAvatar()
-        }
+        presenter?.viewDidLoad()
     }
     
     // MARK: Logout Behavior

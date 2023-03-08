@@ -8,7 +8,7 @@
 import Foundation
 
 protocol ImagesListPresenterProtocol {
-    var photos: [Photo] { get set }
+    var imagesHelper: ImagesHelperProtocol { get set }
     func loadNextPage()
     func setNotificationObserver()
     func updateNextPageIfNeeded(forRowAt indexPath: IndexPath)
@@ -25,22 +25,19 @@ protocol ImagesListPresenterProtocol {
 }
 
 final class ImagesListPresenter: ImagesListPresenterProtocol {
-    var photos: [Photo] = []
+    
     private var imagesListService = ImagesListService.shared
     private var imagesLoaderObserver: NSObjectProtocol?
     
-    private lazy var dateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    }()
-    
     var view: ImagesListViewControllerProtocol
+    var imagesHelper: ImagesHelperProtocol
     
-    init(view: ImagesListViewControllerProtocol) {
-            self.view = view
-        }
+    init(view: ImagesListViewControllerProtocol, imagesHelper: ImagesHelperProtocol) {
+        self.view = view
+        self.imagesHelper = imagesHelper
+    }
+    
+    // MARK: Notification and pages loading
     
     func loadNextPage() {
         imagesListService.fetchPhotosNextPage()
@@ -62,59 +59,58 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         }
     }
     
+    // MARK: Work with photo
+    
     func getFullImageURL(for indexPath: IndexPath) -> URL? {
-        return URL(string: photos[indexPath.row].fullImageURL)
+        imagesHelper.getFullImageURL(for: indexPath)
         
     }
     
     func getThumbImageURL(for indexPath: IndexPath) -> URL? {
-        return URL(string: photos[indexPath.row].thumbImageURL)
+        imagesHelper.getThumbImageURL(for: indexPath)
     }
     
     func countPhotos() -> Int {
-        return photos.count
+        imagesHelper.countPhotos()
     }
     
     func getImageHeight(at indexPath: IndexPath) -> CGFloat {
-        return photos[indexPath.row].size.height
+        imagesHelper.getImageHeight(at: indexPath)
     }
     
     func getImageWidth(at indexPath: IndexPath) -> CGFloat {
-        return photos[indexPath.row].size.width
+        imagesHelper.getImageWidth(at: indexPath)
     }
     
     func getCellHeight(at indexPath: IndexPath, width: CGFloat, left: CGFloat, right: CGFloat, top: CGFloat, bottom: CGFloat) -> CGFloat {
-        let imageWidth = getImageWidth(at: indexPath)
-        let imageHeight = getImageHeight(at: indexPath)
-        
-        let imageViewWidth = width - left - right
-        let scale = imageViewWidth / imageWidth
-        let cellHeight = imageHeight * scale + top + bottom
-        return cellHeight
+        imagesHelper.getCellHeight(at: indexPath, width: width, left: left, right: right, top: top, bottom: bottom)
     }
     
     func getPhoto(at indexPath: IndexPath) -> Photo {
-        return photos[indexPath.row]
+        imagesHelper.getPhoto(at: indexPath)
     }
     
     func updatePhotosArray() {
-        self.photos = imagesListService.photos
+        imagesHelper.updatePhotosArray()
     }
     
     func getDateLabelText(at indexPath: IndexPath) -> String {
-        guard let date = photos[indexPath.row].createdAt else { return "Date error in getDateLabelText" }
-        return dateFormatter.string(from: date)
+        imagesHelper.getDateLabelText(at: indexPath)
     }
     
     func isLiked(at indexPath: IndexPath) -> Bool {
-        return photos[indexPath.row].isLiked
+        imagesHelper.isLiked(at: indexPath)
     }
     
     // MARK: Class methods
     
+    private func countModelPhotos() -> Int {
+        return imagesListService.photos.count
+    }
+    
     private func checkForNeedOfAnimatedUpdate() {
-            let oldCount = photos.count
-            let newCount = imagesListService.photos.count
+            let oldCount = countPhotos()
+            let newCount = countModelPhotos()
             
             if oldCount != newCount {
                 updatePhotosArray()
@@ -122,8 +118,6 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
                 view.didReceivePhotosForTableViewAnimatedUpdate(at: indexPaths)
             }
         }
-        
-        
         
         private func createIndexPaths(from oldCount: Int, to newCount: Int) -> [IndexPath] {
             return (oldCount..<newCount).compactMap { i in

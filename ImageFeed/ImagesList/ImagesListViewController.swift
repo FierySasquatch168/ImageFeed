@@ -42,7 +42,7 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         
         view.backgroundColor = .ypBlack
         setupTableView()
-        presenter = ImagesListPresenter(view: self)
+        presenter = ImagesListPresenter(view: self, imagesHelper: ImagesHelper())
         presenter?.setNotificationObserver()
         presenter?.loadNextPage()
     }
