@@ -6,10 +6,11 @@
 //
 
 import UIKit
+import Kingfisher
 
 protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfilePresenterProtocol? { get set }
-    var profileImage: UIImageView { get set }
+    func setImage(from url: URL?, with cornerRadius: CGFloat)
     func updateUserName(with name: String)
     func updateUserEmail(with email: String)
     func updateUserdescription(with description: String)
@@ -21,6 +22,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     private var alertModel: AlertModel?
     private var alertPresenter: AlertPresenterProtocol?
     private var profileService = ProfileService.shared
+    private var profileImageService = ProfileImageService.shared
     
     lazy var profileImage: UIImageView = {
         let imageView = UIImageView()
@@ -81,8 +83,6 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
         return stackView
     }()
     
-    private var profileImageServiceObserver: NSObjectProtocol?
-    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
@@ -92,22 +92,9 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setNotificationObserver()
+        presenter?.setNotificationObserver()
         presenter?.updateProfile(with: profileService.profile)
-        presenter?.updateAvatar()
-    }
-    
-    // MARK: Observer
-    
-    func setNotificationObserver() {
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self = self else { return }
-            self.presenter?.updateAvatar()
-        }
+        presenter?.updateAvatar(with: profileImageService.avatarURL)
     }
     
     // MARK: Logout Behavior
@@ -116,6 +103,11 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     }
     
     // MARK: Protocol methods
+    
+    func setImage(from url: URL?, with cornerRadius: CGFloat) {
+        let processor = RoundCornerImageProcessor(cornerRadius: cornerRadius)
+        profileImage.kf.setImage(with: url, options: [.processor(processor)])
+    }
     
     func updateUserName(with name: String) {
         userNameLabel.text = name

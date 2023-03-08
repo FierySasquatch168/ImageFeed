@@ -7,18 +7,18 @@
 
 import UIKit
 
-protocol ImagesListViewControllerProtocol: AnyObject {
+
+protocol ImagesListViewControllerProtocol {
     var presenter: ImagesListPresenterProtocol? { get set }
-    func reloadTableView(at indexPath: IndexPath)
     func didReceivePhotosForTableViewAnimatedUpdate(at indexPaths: [IndexPath])
-    func likeChangeFailed()
+    func configCell(for cell: ImagesListCell, with indexPath: IndexPath)
 }
 
 final class ImagesListViewController: UIViewController & ImagesListViewControllerProtocol {
     var presenter: ImagesListPresenterProtocol?
-    
+    private var imagesListService = ImagesListService.shared
     private var alertPresenter: AlertPresenterProtocol?
-
+    
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
@@ -42,31 +42,55 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         
         view.backgroundColor = .ypBlack
         setupTableView()
-        
-        presenter = ImagesListPresenter(view: self, cellConfigurator: CellConfigurator())
-        presenter?.setNotificationObserver()
-        presenter?.loadNextPage()
-        
+        presenter = ImagesListPresenter(view: self, imagesHelper: ImagesHelper())
+        presenter?.viewDidLoad()
     }
     
     // MARK: Protocol methods
-    
-    func reloadTableView(at indexPath: IndexPath) {
-        tableView.reloadRows(at: [indexPath], with: .automatic)
-    }
-    
-    func likeChangeFailed() {
-        self.showLikeErrorAlert()
-    }
-    
     func didReceivePhotosForTableViewAnimatedUpdate(at indexPaths: [IndexPath]) {
         tableView.performBatchUpdates {
             tableView.insertRows(at: indexPaths, with: .automatic)
         }
     }
     
+    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        setupCellMainImage(for: cell, at: indexPath)
+        setupDataLabelText(cell: cell, at: indexPath)
+        setupLikeImage(cell: cell, at: indexPath)
+    }
+    
+    // MARK: Class methods
+    
+    private func setupCellMainImage(for cell: ImagesListCell, at indexPath: IndexPath) {
+        guard let url = presenter?.getThumbImageURL(for: indexPath),
+              let stubImage = UIImage(named: "Stub")
+        else {
+            return
+        }
+        
+        cell.mainImage.kf.setImage(with: url,
+                                   placeholder: stubImage) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(_):
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            case .failure(let error):
+                cell.mainImage.image = stubImage
+                print(error)
+            }
+        }
+    }
+    
+    private func setupDataLabelText(cell: ImagesListCell, at indexPath: IndexPath) {
+        cell.dateLabel.text = presenter?.getDateLabelText(at: indexPath)
+    }
+    
+    private func setupLikeImage(cell: ImagesListCell, at indexPath: IndexPath) {
+        guard let isLiked = presenter?.isLiked(at: indexPath) else { return }
+        cell.setIsLiked(isLiked: isLiked)
+    }
+    
     // MARK: Style
-
     private func setupTableView() {
         view.addSubview(tableView)
         
@@ -81,7 +105,6 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
 }
 
 // MARK: Extension TableView
-
 extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return presenter?.countPhotos() ?? 0
@@ -92,7 +115,7 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         cell.delegate = self
-        presenter?.configCell(for: cell, at: indexPath)
+        configCell(for: cell, with: indexPath)
         return cell
     }
     
@@ -104,26 +127,52 @@ extension ImagesListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return presenter?.getCellHeight(tableView, at: indexPath) ?? 0
+        guard presenter?.countPhotos() != 0,
+              let cellHeight = presenter?.getCellHeight(at: indexPath, width: tableView.bounds.width, left: 16, right: 16, top: 4, bottom: 4)
+        else { return 0 }
+        
+        return cellHeight
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        presenter?.updateNextPageIfNeeded(tableView, forRowAt: indexPath)
+        presenter?.updateNextPageIfNeeded(forRowAt: indexPath)
     }
     
 }
 
 // MARK: Extension cell delegate
-
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
-            presenter?.didTapLikeButton(cell, at: indexPath)
+        guard let indexPath = tableView.indexPath(for: cell),
+              let photo = presenter?.getPhoto(at: indexPath)
+        else { return }
+        
+        UIBlockingProgressHUD.show()
+            imagesListService.changeLike(photoId: photo.id, isLiked: photo.isLiked) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success():
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        // Synchronize the arrays of photos
+                        self.presenter?.updatePhotosArray()
+                        // Change the like image
+                        if let isLiked = self.presenter?.isLiked(at: indexPath) {
+                            cell.setIsLiked(isLiked: isLiked)
+                        }
+                        // Dismiss the loader
+                        UIBlockingProgressHUD.dismiss()
+                    }
+                    
+                case .failure(_):
+                    UIBlockingProgressHUD.dismiss()
+                    self.showLikeErrorAlert()
+            }
+        }
     }
 }
 
 // MARK: Extension AlertDelegate
-
 extension ImagesListViewController: AlertPresenterDelegate {
     func showAlert(alert: UIAlertController?) {
         guard let alert = alert else { return }

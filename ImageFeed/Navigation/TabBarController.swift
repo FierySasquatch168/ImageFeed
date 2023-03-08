@@ -17,7 +17,7 @@ final class TabBarController: UITabBarController {
         navVC.navigationBar.isHidden = true
 
         let profileVC = ProfileViewController()
-        let profilePresenter = ProfilePresenter()
+        let profilePresenter = ProfilePresenter(logoutHelper: LogoutHelper())
         profileVC.presenter = profilePresenter
         profilePresenter.view = profileVC
         
