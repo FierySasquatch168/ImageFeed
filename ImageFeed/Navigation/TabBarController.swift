@@ -11,12 +11,21 @@ final class TabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let navVC = CustomNavigationController(rootViewController: ImagesListViewController())
+        
+        let imagesListVC = ImagesListViewController()
+        let imagesListPresenter = ImagesListPresenter(imagesHelper: ImagesHelper())
+        imagesListVC.presenter = imagesListPresenter
+        imagesListPresenter.view = imagesListVC
+        
+        let navVC = CustomNavigationController(rootViewController: imagesListVC)
         navVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_editorial_active"), tag: 0)
         navVC.navigationBar.isHidden = true
 
         let profileVC = ProfileViewController()
+        let profilePresenter = ProfilePresenter(logoutHelper: LogoutHelper())
+        profileVC.presenter = profilePresenter
+        profilePresenter.view = profileVC
+        
         profileVC.tabBarItem = UITabBarItem(title: nil, image: UIImage(named: "tab_profile_active"), tag: 1)
         
         UITabBar.appearance().tintColor = .ypWhite

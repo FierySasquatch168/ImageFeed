@@ -8,14 +8,23 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfilePresenterProtocol? { get set }
+    func setImage(from url: URL?, with cornerRadius: CGFloat)
+    func updateUserName(with name: String)
+    func updateUserEmail(with email: String)
+    func updateUserdescription(with description: String)
+}
+
+final class ProfileViewController: UIViewController & ProfileViewControllerProtocol {
+    var presenter: ProfilePresenterProtocol?
     
     private var alertModel: AlertModel?
     private var alertPresenter: AlertPresenterProtocol?
+    private var profileService = ProfileService.shared
+    private var profileImageService = ProfileImageService.shared
     
-    private var avatarCornerRadius: CGFloat = 35
-    
-    private lazy var profileImage: UIImageView = {
+    lazy var profileImage: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -32,6 +41,7 @@ final class ProfileViewController: UIViewController {
     }()
     private lazy var logoutButton: UIButton = {
         let button = UIButton()
+        button.accessibilityIdentifier = "logoutButton"
         return button
     }()
     private lazy var userNameLabel: UILabel = {
@@ -74,9 +84,6 @@ final class ProfileViewController: UIViewController {
         return stackView
     }()
     
-    private var profileService = ProfileService.shared
-    private var profileImageServiceObserver: NSObjectProtocol?
-    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
@@ -86,52 +93,33 @@ final class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setNotificationObserver()
-        updateProfileDetails(profile: profileService.profile)
-        updateAvatar()
-        
+        presenter?.setNotificationObserver()
+        presenter?.updateProfile(with: profileService.profile)
+        presenter?.updateAvatar(with: profileImageService.avatarURL)
     }
     
-    // MARK: Observer
-    
-    func setNotificationObserver() {
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self = self else { return }
-            self.updateAvatar()
-        }
-    }
-    
-    // MARK: Behavior
+    // MARK: Logout Behavior
     @objc private func logout() {
         showLogoutAlert()
     }
     
-    private func clearUserDataFromMemory() {
-        // хранилище - удалить токен
-        OAuth2TokenStorage().token = nil
-        // вебвью - удалить куки
-        WebViewViewController.clean()
-    }
+    // MARK: Protocol methods
     
-    private func updateProfileDetails(profile: Profile?) {
-        guard let profile = profile else { return }
-        userNameLabel.text = profile.username
-        userEmailLabel.text = profile.loginName
-        userDescriptionLabel.text = profile.bio
-    }
-    
-    private func updateAvatar() {
-        guard let profileImageURL = ProfileImageService.shared.avatarURL,
-              let url = URL(string: profileImageURL)
-        else {
-            return
-        }
-        let processor = RoundCornerImageProcessor(cornerRadius: avatarCornerRadius)
+    func setImage(from url: URL?, with cornerRadius: CGFloat) {
+        let processor = RoundCornerImageProcessor(cornerRadius: cornerRadius)
         profileImage.kf.setImage(with: url, options: [.processor(processor)])
+    }
+    
+    func updateUserName(with name: String) {
+        userNameLabel.text = name
+    }
+    
+    func updateUserEmail(with email: String) {
+        userEmailLabel.text = "@\(email)" 
+    }
+    
+    func updateUserdescription(with description: String) {
+        userDescriptionLabel.text = description
     }
     
     // MARK: UI setup
@@ -169,6 +157,8 @@ final class ProfileViewController: UIViewController {
     }
 }
 
+// MARK: Extension AlertPresenterDelegate
+
 extension ProfileViewController: AlertPresenterDelegate {
     func showAlert(alert: UIAlertController?) {
         guard let alert = alert else { return }
@@ -182,12 +172,10 @@ extension ProfileViewController: AlertPresenterDelegate {
                                actionText: "Нет", leftCompletion: { [weak self] _ in
             guard let self = self else { return }
             UIBlockingProgressHUD.show()
-            self.clearUserDataFromMemory()
+            self.presenter?.logout()
             UIBlockingProgressHUD.dismiss()
-            guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
-            window.rootViewController = SplashViewController()
+            
         })
-        
         
         alertPresenter = AlertPresenter(alertDelegate: self)
         alertPresenter?.presentAlertController(alert: alert)

@@ -32,6 +32,8 @@ final class AuthViewController: UIViewController  {
         button.setTitleColor(.ypBlack, for: .normal)
         button.setTitle("Войти", for: .normal)
         
+        button.accessibilityIdentifier = "Authenticate"
+        
         button.addTarget(self, action: #selector(goToWebVC), for: .touchUpInside)
         
         return button
@@ -57,11 +59,15 @@ final class AuthViewController: UIViewController  {
 
     
     @objc private func goToWebVC() {
-        let nextViewController = WebViewViewController()
-        nextViewController.modalPresentationStyle = .fullScreen
-        nextViewController.authDelegate = self
+        let webViewController = WebViewViewController()
+        let authHelper = AuthHelper()
+        let webViewPresenter = WebViewPresenter(authHelper: authHelper)
+        webViewController.presenter = webViewPresenter
+        webViewPresenter.view = webViewController
+        webViewController.authDelegate = self
         
-        self.present(nextViewController, animated: true)
+        webViewController.modalPresentationStyle = .fullScreen
+        self.present(webViewController, animated: true)
     }
     
     // MARK: UI setup
@@ -98,7 +104,6 @@ extension AuthViewController: WebViewViewControllerDelegate {
     
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         authViewControllerDelegate?.authViewController(self, didAuthenticateWithCode: code)
-        
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {

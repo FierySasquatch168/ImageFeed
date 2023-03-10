@@ -20,6 +20,7 @@ final class SingleImageViewController: UIViewController {
     }()
     private lazy var dismissButton: UIButton = {
         let button = UIButton()
+        button.accessibilityIdentifier = "dismissButton"
         return button
     }()
     private lazy var shareButton: UIButton = {

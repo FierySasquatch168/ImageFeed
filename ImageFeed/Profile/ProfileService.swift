@@ -17,13 +17,6 @@ final class ProfileService {
         let firstName: String?
         let lastName: String?
         let bio: String?
-        
-        enum CodingKeys: String, CodingKey {
-            case username
-            case firstName = "first_name"
-            case lastName = "last_name"
-            case bio
-        }
     }
     
     private(set) var profile: Profile?
@@ -65,7 +58,7 @@ final class ProfileService {
             var urlRequest = URLRequest.makeHTTPRequest(
                 path: "/me",
                 httpMethod: "GET",
-                baseURL: defaultBaseURL)
+                baseURL: DefaultBaseURL)
                 
         urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         

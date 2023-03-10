@@ -8,12 +8,18 @@
 import UIKit
 import WebKit
 
-final class WebViewViewController: UIViewController {
+protocol WebViewControllerProtocol: AnyObject {
+    var presenter: WebViewPresenterProtocol? { get set }
+    func load(request: URLRequest)
+    func setProgressValue(_ newValue: Float)
+    func setProgressHidden(_ isHidden: Bool)
+}
 
-    private let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+final class WebViewViewController: UIViewController & WebViewControllerProtocol {
     private var estimatedProgressObservation: NSKeyValueObservation?
     
     weak var authDelegate: WebViewViewControllerDelegate?
+    var presenter: WebViewPresenterProtocol?
     
     static func clean() {
         // Очищаем все куки из хранилища.
@@ -39,6 +45,8 @@ final class WebViewViewController: UIViewController {
         let webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.navigationDelegate = self
         
+        webView.accessibilityIdentifier = "UnsplashWebView"
+        
         return webView
     }()
     
@@ -55,9 +63,8 @@ final class WebViewViewController: UIViewController {
 
         setupWebView()
         setupBackButton()
-        setupURLComponents()
         setupProgressView()
-        
+        presenter?.viewDidLoad()
         setupKVObserver()
         
     }
@@ -68,44 +75,32 @@ final class WebViewViewController: UIViewController {
             \.estimatedProgress,
              changeHandler: { [weak self] _, _ in
                  guard let self = self else { return }
-                 self.updateProgress()
+                 self.presenter?.didUpdateProgressValue(self.webView.estimatedProgress)
              })
+    }
+    
+    // MARK: Protocol methods
+    
+    func load(request: URLRequest) {
+        webView.load(request)
+    }
+    
+    func setProgressValue(_ newValue: Float) {
+        progressView.progress = newValue
+    }
+    
+    func setProgressHidden(_ isHidden: Bool) {
+        progressView.isHidden = isHidden
     }
     
     // MARK: Class methods
     
-    private func updateProgress() {
-        progressView.progress = Float(webView.estimatedProgress)
-        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
-    }
-    
     private func code(from navigationAction: WKNavigationAction) -> String? {
-        if
-            let url = navigationAction.request.url, /// Получаем из навигационного действия navigationAction URL
-            let urlComponents = URLComponents(string: url.absoluteString), /// Получаем значения компонентов из URL
-            urlComponents.path == "/oauth/authorize/native", /// Проверяем, совпадает ли адрес запроса с адресом получения кода
-            let items = urlComponents.queryItems, /// Проверяем, есть ли в URLComponents компоненты запроса (в них должен быть код)
-            let codeItem = items.first(where: { $0.name == "code" }) /// Ищем в массиве компонентов такой компонент, у которого значение name == code
-        {
-            
-            return codeItem.value /// Если ок, возвращаем значение value найденного компонента
-        } else {
-            return nil /// Иначе возвращаем нил
+        if let url = navigationAction.request.url {
+            return presenter?.code(from: url)
         }
-    }
-    
-    private func setupURLComponents() {
-        var urlComponents = URLComponents(string: unsplashAuthorizeURLString)
-        urlComponents?.queryItems = [
-        URLQueryItem(name: "client_id", value: accessKey),
-        URLQueryItem(name: "redirect_uri", value: redirectURI),
-        URLQueryItem(name: "response_type", value: "code"),
-        URLQueryItem(name: "scope", value: accessScope)
-        ]
-        guard let url = urlComponents?.url else { return }
         
-        let request = URLRequest(url: url)
-        webView.load(request)
+        return nil
     }
     
     @objc private func didTapBackButton() {
