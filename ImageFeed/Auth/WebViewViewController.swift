@@ -45,6 +45,8 @@ final class WebViewViewController: UIViewController & WebViewControllerProtocol 
         let webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.navigationDelegate = self
         
+        webView.accessibilityIdentifier = "UnsplashWebView"
+        
         return webView
     }()
     
