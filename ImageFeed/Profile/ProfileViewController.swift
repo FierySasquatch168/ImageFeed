@@ -41,6 +41,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     }()
     private lazy var logoutButton: UIButton = {
         let button = UIButton()
+        button.accessibilityIdentifier = "logoutButton"
         return button
     }()
     private lazy var userNameLabel: UILabel = {
@@ -114,7 +115,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     }
     
     func updateUserEmail(with email: String) {
-        userEmailLabel.text = email
+        userEmailLabel.text = "@\(email)" 
     }
     
     func updateUserdescription(with description: String) {
@@ -175,7 +176,6 @@ extension ProfileViewController: AlertPresenterDelegate {
             UIBlockingProgressHUD.dismiss()
             
         })
-        
         
         alertPresenter = AlertPresenter(alertDelegate: self)
         alertPresenter?.presentAlertController(alert: alert)

@@ -26,11 +26,8 @@ final class ImagesListTests: XCTestCase {
     
     func testPresenterNotificationCentreNotNil() {
         // given
-        let viewController = ImagesListViewControllerSpy()
         let imagesHelper = ImagesHelper()
         let presenter = ImagesListPresenter(imagesHelper: imagesHelper)
-        viewController.presenter = presenter
-        presenter.view = viewController
         
         // when
         presenter.viewDidLoad()
