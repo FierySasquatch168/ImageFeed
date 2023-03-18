@@ -47,6 +47,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         setupUserName(from: profile)
         setupUserEmail(from: profile)
         setupUserDescription(from: profile)
+        view?.removeGradients()
     }
     
     func updateAvatar(with stringUrl: String?) {

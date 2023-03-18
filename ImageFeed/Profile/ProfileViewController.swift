@@ -14,6 +14,7 @@ protocol ProfileViewControllerProtocol: AnyObject {
     func updateUserName(with name: String)
     func updateUserEmail(with email: String)
     func updateUserdescription(with description: String)
+    func removeGradients()
 }
 
 final class ProfileViewController: UIViewController & ProfileViewControllerProtocol {
@@ -93,6 +94,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupGradients()
         presenter?.setNotificationObserver()
         presenter?.updateProfile(with: profileService.profile)
         presenter?.updateAvatar(with: profileImageService.avatarURL)
@@ -101,6 +103,21 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     // MARK: Logout Behavior
     @objc private func logout() {
         showLogoutAlert()
+    }
+    
+    // MARK: Gradient pre-image
+    func setupGradients() {
+        profileImage.addGradient(frame: CGRect(x: 0, y: 0, width: 70, height: 70), cornerRadius: 35)
+        userNameLabel.addGradient(frame: CGRect(x: 0, y: 0, width: 223, height: 30), cornerRadius: 15)
+        userEmailLabel.addGradient(frame: CGRect(x: 0, y: 0, width: 150, height: 20), cornerRadius: 10)
+        userDescriptionLabel.addGradient(frame: CGRect(x: 0, y: 0, width: 90, height: 20), cornerRadius: 10)
+    }
+    
+    func removeGradients() {
+        profileImage.removeGradient()
+        userNameLabel.removeGradient()
+        userEmailLabel.removeGradient()
+        userDescriptionLabel.removeGradient()
     }
     
     // MARK: Protocol methods
