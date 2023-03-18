@@ -65,14 +65,18 @@ final class ImagesListViewController: UIViewController & ImagesListViewControlle
         else {
             return
         }
-        
-        cell.mainImage.kf.setImage(with: url,
-                                   placeholder: stubImage) { [weak self] result in
+        let height: CGFloat = cell.frame.height
+        let width: CGFloat = cell.frame.width
+        let frame = CGRect(x: 0, y: 0, width: width, height: height)
+        cell.mainImage.addGradient(frame: frame, cornerRadius: cell.mainImage.layer.cornerRadius)
+        cell.mainImage.kf.setImage(with: url) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(_):
                 self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                cell.mainImage.removeGradient()
             case .failure(let error):
+                cell.mainImage.removeGradient()
                 cell.mainImage.image = stubImage
                 print(error)
             }

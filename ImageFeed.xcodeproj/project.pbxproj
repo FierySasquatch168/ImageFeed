@@ -14,6 +14,7 @@
 		370F753A298C64CB002B4D31 /* ProfileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370F7539298C64CB002B4D31 /* ProfileImageService.swift */; };
 		37280BCA297ADE3200F6FBCD /* OAuthTokenResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37280BC9297ADE3200F6FBCD /* OAuthTokenResponseBody.swift */; };
 		37280BCC297ADFB000F6FBCD /* OAuth2Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37280BCB297ADFAF00F6FBCD /* OAuth2Service.swift */; };
+		372C1DEF29C5CAB700BD3DAF /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372C1DEE29C5CAB700BD3DAF /* UIView+Extension.swift */; };
 		37305297295F3485004B089F /* SingleImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37305296295F3485004B089F /* SingleImageViewController.swift */; };
 		373A343929B9EB7C00FE9955 /* ImageFeedUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A343829B9EB7C00FE9955 /* ImageFeedUITests.swift */; };
 		373A343B29B9EB7C00FE9955 /* ImageFeedUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A343A29B9EB7C00FE9955 /* ImageFeedUITestsLaunchTests.swift */; };
@@ -87,6 +88,7 @@
 		370F7539298C64CB002B4D31 /* ProfileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageService.swift; sourceTree = "<group>"; };
 		37280BC9297ADE3200F6FBCD /* OAuthTokenResponseBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthTokenResponseBody.swift; sourceTree = "<group>"; };
 		37280BCB297ADFAF00F6FBCD /* OAuth2Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuth2Service.swift; sourceTree = "<group>"; };
+		372C1DEE29C5CAB700BD3DAF /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		37305296295F3485004B089F /* SingleImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleImageViewController.swift; sourceTree = "<group>"; };
 		373A343629B9EB7C00FE9955 /* ImageFeedUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageFeedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		373A343829B9EB7C00FE9955 /* ImageFeedUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFeedUITests.swift; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 				37C938EB294E34C40068B964 /* UIColor+Extensions.swift */,
 				37C92E9E297C5BA8004EE4B4 /* URL+Extensions.swift */,
 				377688AB29AB6D5E004A985C /* UIApplication+Extension.swift */,
+				372C1DEE29C5CAB700BD3DAF /* UIView+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -579,6 +582,7 @@
 				37C92EA1297C5BCD004EE4B4 /* OAuth2TokenStorage.swift in Sources */,
 				37FCDC512979BFA800526F77 /* AuthViewController.swift in Sources */,
 				370F753A298C64CB002B4D31 /* ProfileImageService.swift in Sources */,
+				372C1DEF29C5CAB700BD3DAF /* UIView+Extension.swift in Sources */,
 				37ABA21629B91EC400696212 /* CustomDateFormatter.swift in Sources */,
 				370F7534298C0977002B4D31 /* ProfileService.swift in Sources */,
 				37F40AD2299F7AB30025FB3D /* ImagesListService.swift in Sources */,
