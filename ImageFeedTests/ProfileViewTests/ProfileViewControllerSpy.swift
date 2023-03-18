@@ -9,6 +9,7 @@
 import Foundation
 
 final class ProfileViewControllerSpy: ProfileViewControllerProtocol {
+    
     var presenter: ImageFeed.ProfilePresenterProtocol?
     var setImageCalled: Bool = false
     var updateUserNameCalled: Bool = false
@@ -29,6 +30,10 @@ final class ProfileViewControllerSpy: ProfileViewControllerProtocol {
     
     func updateUserdescription(with description: String) {
         updateUserdescriptionCalled = true
+    }
+    
+    func removeGradients() {
+        
     }
     
     
